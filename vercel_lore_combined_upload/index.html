@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lor:e — 취향 기반 작품 탐색 & 캐릭터 대화 AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@100;200;300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07060e;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hi: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08);
+  --border-hi: rgba(255,255,255,0.18);
+  --t1: #f0eeff;
+  --t2: #a099c0;
+  --t3: #5a5372;
+  --violet: #c4b5fd;
+  --violet-mid: rgba(196,181,253,0.25);
+  --violet-dim: rgba(196,181,253,0.1);
+  --cyan: #67e8f9;
+  --cyan-mid: rgba(103,232,249,0.25);
+  --cyan-dim: rgba(103,232,249,0.1);
+  --rose: #fb7185;
+  --rose-mid: rgba(251,113,133,0.25);
+  --rose-dim: rgba(251,113,133,0.1);
+  --amber: #fbbf24;
+  --amber-dim: rgba(251,191,36,0.1);
+  --ff-display: 'Black Han Sans', sans-serif;
+  --ff-body: 'Noto Sans KR', sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--ff-body);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+
+/* === BACKGROUND === */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  will-change: transform;
+}
+.orb-1 {
+  width: 650px; height: 650px;
+  background: radial-gradient(circle, rgba(139,92,246,0.32) 0%, transparent 70%);
+  top: -200px; left: -120px;
+  animation: drift1 22s ease-in-out infinite;
+}
+.orb-2 {
+  width: 520px; height: 520px;
+  background: radial-gradient(circle, rgba(56,189,248,0.22) 0%, transparent 70%);
+  top: 35%; right: -160px;
+  animation: drift2 27s ease-in-out infinite;
+}
+.orb-3 {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(244,114,182,0.18) 0%, transparent 70%);
+  bottom: 25%; left: 15%;
+  animation: drift3 19s ease-in-out infinite;
+}
+.orb-4 {
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(251,191,36,0.13) 0%, transparent 70%);
+  bottom: -80px; right: 28%;
+  animation: drift4 24s ease-in-out infinite;
+}
+@keyframes drift1 {
+  0%,100%{transform:translate(0,0) scale(1);}
+  33%{transform:translate(60px,50px) scale(1.08);}
+  66%{transform:translate(-35px,80px) scale(0.95);}
+}
+@keyframes drift2 {
+  0%,100%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(-80px,55px) scale(1.12);}
+}
+@keyframes drift3 {
+  0%,100%{transform:translate(0,0) scale(1);}
+  40%{transform:translate(55px,-65px) scale(1.1);}
+  70%{transform:translate(-30px,30px) scale(0.92);}
+}
+@keyframes drift4 {
+  0%,100%{transform:translate(0,0);}
+  60%{transform:translate(65px,-45px) scale(1.18);}
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.022;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+}
+
+/* === LAYOUT === */
+.container {
+  position: relative;
+  z-index: 10;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* === NAV === */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 16px 0;
+  backdrop-filter: blur(18px);
+  background: rgba(7,6,14,0.72);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  font-family: var(--ff-display);
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg, var(--violet), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.nav-cta {
+  background: linear-gradient(135deg, var(--violet), var(--cyan));
+  color: #07060e;
+  font-family: var(--ff-body);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 20px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.nav-cta:hover { opacity: 0.85; transform: scale(1.02); }
+
+/* === HERO === */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 0 80px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--violet-dim);
+  border: 1px solid var(--violet-mid);
+  color: var(--violet);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 100px;
+  margin-bottom: 28px;
+  animation: fadeUp 0.8s ease both;
+}
+.hero-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--violet);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+.hero-title {
+  font-family: var(--ff-body);
+  font-weight: 200;
+  font-size: clamp(38px, 6vw, 68px);
+  line-height: 1.15;
+  margin-bottom: 22px;
+  letter-spacing: -0.02em;
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+.hero-title .hl-v { color: var(--violet); }
+.hero-title .hl-c { color: var(--cyan); }
+
+.hero-sub {
+  font-size: 17px;
+  color: var(--t2);
+  line-height: 1.9;
+  margin-bottom: 36px;
+  max-width: 540px;
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+.hero-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid;
+}
+.pill-v { border-color: var(--violet-mid); background: var(--violet-dim); color: var(--violet); }
+.pill-c { border-color: var(--cyan-mid); background: var(--cyan-dim); color: var(--cyan); }
+.pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+.btn-primary {
+  padding: 14px 32px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, var(--violet), var(--cyan));
+  color: #07060e;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(196,181,253,0.35); }
+.btn-secondary {
+  padding: 14px 28px;
+  border-radius: 100px;
+  background: transparent;
+  color: var(--t2);
+  font-size: 15px;
+  border: 1px solid var(--border-hi);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--ff-body);
+}
+.btn-secondary:hover { border-color: var(--violet-mid); color: var(--violet); }
+
+/* === SCROLL REVEAL === */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+
+/* === SECTION === */
+section { padding: 100px 0; position: relative; z-index: 10; }
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.eyebrow.v { color: var(--violet); }
+.eyebrow.c { color: var(--cyan); }
+.eyebrow.r { color: var(--rose); }
+.eyebrow.a { color: var(--amber); }
+.eyebrow.dim { color: var(--t3); }
+
+.section-title {
+  font-family: var(--ff-body);
+  font-weight: 200;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.22;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+.section-desc {
+  font-size: 16px;
+  color: var(--t2);
+  line-height: 1.88;
+  max-width: 640px;
+}
+.hl-v { color: var(--violet); }
+.hl-c { color: var(--cyan); }
+.hl-r { color: var(--rose); }
+.hl-a { color: var(--amber); }
+
+/* === DIVIDER === */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  position: relative; z-index: 10;
+}
+
+/* === PROBLEM SECTION === */
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-top: 40px;
+}
+.prob-cell { background: var(--bg); padding: 28px 32px; }
+.prob-cell.dark { background: rgba(255,255,255,0.025); }
+.prob-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 18px;
+}
+.prob-label.old { color: var(--t3); }
+.prob-label.new { color: var(--violet); }
+.prob-steps { display: flex; flex-direction: column; gap: 11px; }
+.prob-step {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--t2); line-height: 1.5;
+}
+.prob-step .ic { font-size: 15px; flex-shrink:0; margin-top:1px; }
+.prob-step.faded { opacity: 0.35; text-decoration: line-through; }
+.prob-step.hi { color: var(--violet); }
+.prob-step.hi-c { color: var(--cyan); }
+
+/* === CARD === */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  transition: border-color 0.3s, transform 0.3s, background 0.3s;
+}
+.card:hover { background: var(--surface-hi); transform: translateY(-2px); }
+.card.cv:hover { border-color: var(--violet-mid); }
+.card.cc:hover { border-color: var(--cyan-mid); }
+.card.cr:hover { border-color: var(--rose-mid); }
+
+/* === SEARCH DEMO === */
+.search-demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-top: 48px;
+}
+.search-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.025);
+}
+.search-ic { color: var(--t3); font-size: 16px; }
+.search-typing {
+  flex: 1;
+  font-size: 15px;
+  color: var(--t1);
+  min-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cursor {
+  display: inline-block; width: 2px; height: 16px;
+  background: var(--violet); vertical-align: middle;
+  margin-left: 2px; animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+.search-results { padding: 18px 24px; display: flex; flex-direction: column; gap: 10px; }
+.s-result {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  animation: fadeUp 0.4s ease both;
+}
+.s-cover { width: 34px; height: 50px; border-radius: 4px; flex-shrink: 0; }
+.s-info { flex: 1; }
+.s-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+.s-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.s-tag {
+  font-size: 11px; padding: 2px 7px;
+  border-radius: 100px;
+  background: var(--violet-dim); color: var(--violet);
+  border: 1px solid var(--violet-mid);
+}
+.s-match { font-size: 12px; color: var(--cyan); white-space: nowrap; }
+
+/* === CHAT DEMO === */
+.chat-demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.chat-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 15px 22px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.025);
+}
+.char-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  background: linear-gradient(135deg, var(--violet-mid), var(--cyan-dim));
+  border: 1px solid var(--border-hi);
+}
+.char-name { font-weight: 700; font-size: 14px; }
+.char-status { font-size: 12px; color: var(--cyan); }
+.chat-messages { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+.msg { display: flex; gap: 10px; max-width: 84%; }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.msg.char { align-self: flex-start; }
+.msg-bubble {
+  padding: 12px 16px; border-radius: 16px;
+  font-size: 14px; line-height: 1.65;
+}
+.msg.user .msg-bubble {
+  background: var(--violet-mid); border: 1px solid var(--violet-mid);
+  border-bottom-right-radius: 4px;
+}
+.msg.char .msg-bubble {
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.mem-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 100px; margin-bottom: 6px;
+}
+.mem-badge.pinned { background: var(--violet-dim); color: var(--violet); border: 1px solid var(--violet-mid); }
+.mem-badge.longterm { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+.mem-badge.short { background: rgba(59,130,246,0.18); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+
+/* === MEMORY TIERS === */
+.tier {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 18px 22px; border-radius: var(--radius-md);
+  border: 1px solid var(--border); background: var(--surface);
+  transition: all 0.3s;
+}
+.tier:hover { transform: translateX(5px); border-color: var(--border-hi); }
+.tier-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.tier-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 3px; }
+.tier-desc { font-size: 13px; color: var(--t2); line-height: 1.6; }
+
+/* === GROUP CHAT === */
+.group-chat-demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-top: 40px;
+}
+.group-header {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 13px 22px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  font-size: 13px; color: var(--t2);
+}
+.member-chip {
+  padding: 3px 10px; border-radius: 100px;
+  font-size: 12px; font-weight: 700;
+}
+.mc-v { background: var(--violet-dim); color: var(--violet); border: 1px solid var(--violet-mid); }
+.mc-r { background: var(--rose-dim); color: var(--rose); border: 1px solid var(--rose-mid); }
+.mc-c { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-mid); }
+.group-messages { padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+.gm { display: flex; gap: 10px; }
+.gm-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.av-v { background: var(--violet-dim); border: 1px solid var(--violet-mid); }
+.av-r { background: var(--rose-dim); border: 1px solid var(--rose-mid); }
+.av-c { background: var(--cyan-dim); border: 1px solid var(--cyan-mid); }
+.gm-content { flex: 1; }
+.gm-name { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+.gm-name.v { color: var(--violet); }
+.gm-name.r { color: var(--rose); }
+.gm-name.c { color: var(--cyan); }
+.gm-text {
+  font-size: 13px; line-height: 1.65;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 14px;
+  display: inline-block; max-width: 420px;
+}
+.observer-bar {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 24px;
+  background: rgba(251,191,36,0.05);
+  border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--amber);
+}
+
+/* === PRICING === */
+.sub-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px;
+}
+.sub-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px 28px;
+  background: var(--surface);
+  transition: all 0.3s;
+}
+.sub-card:hover { transform: translateY(-2px); }
+.sub-card.v { border-left: 3px solid var(--violet); }
+.sub-card.c { border-left: 3px solid var(--cyan); }
+.sub-price { font-family: var(--ff-display); font-size: 28px; margin-bottom: 4px; }
+.sub-subtitle { font-weight: 700; font-size: 15px; margin-bottom: 12px; color: var(--t2); }
+.sub-feats { list-style: none; display: flex; flex-direction: column; gap: 7px; font-size: 13px; color: var(--t2); }
+.sub-feats li { display: flex; gap: 8px; align-items: flex-start; }
+.sub-feats li::before { content: '·'; font-weight: 700; }
+.sub-card.v .sub-feats li::before { color: var(--violet); }
+.sub-card.c .sub-feats li::before { color: var(--cyan); }
+
+.chip-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 20px;
+}
+.chip-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 18px 14px;
+  transition: all 0.3s; position: relative; overflow: hidden; text-align: center;
+}
+.chip-card:hover { transform: translateY(-2px); border-color: var(--border-hi); }
+.chip-card.featured { border-color: var(--violet-mid); background: var(--violet-dim); }
+.chip-card.featured::after {
+  content: '★';
+  position: absolute; top: 8px; right: 10px;
+  font-size: 11px; color: var(--violet);
+}
+.chip-name { font-size: 11px; font-weight: 700; color: var(--t3); margin-bottom: 8px; }
+.chip-price { font-family: var(--ff-display); font-size: 16px; margin-bottom: 4px; }
+.chip-amount { font-size: 12px; color: var(--violet); margin-bottom: 10px; }
+.chip-margin { font-size: 11px; font-weight: 700; color: var(--cyan); }
+
+/* === CTA === */
+.cta-wrap { text-align: center; padding: 120px 0; position: relative; z-index: 10; }
+.cta-glow {
+  position: absolute; width: 600px; height: 350px;
+  background: radial-gradient(ellipse, rgba(196,181,253,0.13) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.cta-title { font-family: var(--ff-body); font-weight: 200; font-size: clamp(30px, 5vw, 54px); line-height: 1.22; margin-bottom: 16px; letter-spacing: -0.02em; }
+.cta-desc { font-size: 16px; color: var(--t2); max-width: 480px; margin: 0 auto 36px; }
+.cta-note { font-size: 13px; color: var(--t3); margin-top: 16px; }
+
+/* === FOOTER === */
+footer {
+  position: relative; z-index: 10;
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px; color: var(--t3);
+}
+
+/* === ANIMATIONS === */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 720px) {
+  .problem-grid, .sub-grid { grid-template-columns: 1fr; }
+  .chip-grid { grid-template-columns: repeat(3, 1fr); }
+  .hero-actions { flex-direction: column; }
+  .three-col { grid-template-columns: 1fr 1fr !important; }
+  .two-col { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 480px) {
+  .chip-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-canvas">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+<div class="grain"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <div class="logo">lor:e</div>
+      <button class="nav-cta" onclick="openDesktopPrototype(event)">사전 등록하기</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">합법 플랫폼 최초 · 자연어 작품 탐색 + 캐릭터 대화 AI</div>
+    <h1 class="hero-title">
+      당신의 취향은<br>
+      그 어떤 태그보다<br>
+      <span class="hl-v">복잡하다</span>.
+    </h1>
+    <p class="hero-sub">
+      말로 설명하면 우리가 찾아준다.<br>
+      찾은 작품의 캐릭터와 직접 대화하고,<br>
+      그 기억을 영구히 소장할 수 있다.
+    </p>
+    <div class="hero-pills">
+      <div class="pill pill-v"><span class="dot"></span> 작품 탐색 AI</div>
+      <div class="pill pill-c"><span class="dot"></span> 캐릭터 대화 AI</div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="openDesktopPrototype(event)">지금 경험하기</button>
+      <button class="btn-secondary">더 알아보기 ↓</button>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="eyebrow dim">The Problem</p>
+      <h2 class="section-title">원하는 작품이 머릿속에는 있는데,<br>찾을 수가 없다.</h2>
+      <p class="section-desc">취향이 구체적일수록 기존 플랫폼의 태그 시스템은 무용지물이 된다. 결국 SNS 입소문이나 직접 발품에 의존하게 된다.</p>
+    </div>
+    <div class="problem-grid reveal">
+      <div class="prob-cell">
+        <div class="prob-label old">기존 합법 플랫폼</div>
+        <div class="prob-steps">
+          <div class="prob-step"><span class="ic">🏷️</span> 태그 클릭 → 판타지, 로맨스, 현대물...</div>
+          <div class="prob-step"><span class="ic">😐</span> 결과가 다 비슷해 보인다</div>
+          <div class="prob-step faded"><span class="ic">💭</span> "뱀파이어물인데 인간이 주인공이 아닌 것"</div>
+          <div class="prob-step faded"><span class="ic">💭</span> "역하렘인데 빙의 설정 없는 것"</div>
+          <div class="prob-step"><span class="ic">🚪</span> 그냥 포기하거나 SNS 검색으로 이탈</div>
+        </div>
+      </div>
+      <div class="prob-cell dark">
+        <div class="prob-label new">lor:e</div>
+        <div class="prob-steps">
+          <div class="prob-step hi"><span class="ic">✍️</span> "뱀파이어물인데 인간이 주인공이 아닌 것" 입력</div>
+          <div class="prob-step hi-c"><span class="ic">✨</span> 조건을 이해한 AI가 맞춤 작품 추천</div>
+          <div class="prob-step hi-c"><span class="ic">💬</span> 마음에 드는 작품의 캐릭터와 바로 대화</div>
+          <div class="prob-step hi"><span class="ic">♾️</span> 그 대화를 영구히 소장</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DISCOVERY AI -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="eyebrow v">① 작품 탐색 AI</p>
+      <h2 class="section-title">찾던 작품,<br>사실 존재하고 있었어요</h2>
+      <p class="section-desc">감정·분위기·관계 구도·클리셰를 자연어로 입력하면, 태그로 표현 못했던 바로 그 작품을 찾을 수 있다. 검색이 막히는 이용자는 AI와 대화하며 취향을 정리한 뒤 맞춤 작품 추천으로 이어질 수 있다.</p>
+    </div>
+
+    <div class="search-demo reveal">
+      <div class="search-bar">
+        <span class="search-ic">🔍</span>
+        <div class="search-typing" id="typing-demo"><span class="cursor"></span></div>
+      </div>
+      <div class="search-results" id="search-results">
+        <div style="padding:16px 0;text-align:center;font-size:13px;color:var(--t3)">검색어를 입력하면 결과가 표시됩니다...</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:20px" class="three-col">
+      <div class="card cv reveal">
+        <div style="font-size:22px;margin-bottom:10px">🏷️</div>
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px">사용자 정의 태그</div>
+        <div style="font-size:13px;color:var(--t2)">플랫폼 언어로 표현 안 되는 취향도 직접 태그를 만들어 검색 가능.</div>
+      </div>
+      <div class="card cv reveal reveal-d1">
+        <div style="font-size:22px;margin-bottom:10px">🌐</div>
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px">크로스 플랫폼</div>
+        <div style="font-size:13px;color:var(--t2)">리디·레진·카카오페이지 가리지 않고 통합 탐색. 플랫폼 경계를 초월.</div>
+      </div>
+      <div class="card cv reveal reveal-d2">
+        <div style="font-size:22px;margin-bottom:10px">🔞</div>
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px">19세 콘텐츠도</div>
+        <div style="font-size:13px;color:var(--t2)">관계 구도·수위·특정 설정 등 기존 플랫폼이 절대 제공하지 못하는 세밀한 탐색.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CHARACTER AI -->
+<section>
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start" class="two-col">
+      <div>
+        <div class="reveal">
+          <p class="eyebrow c">② 캐릭터 대화 AI</p>
+          <h2 class="section-title">최애와<br>다시 한 번 만나세요</h2>
+          <p class="section-desc" style="margin-bottom:28px">원작 설정 기반 · 4단계 기억 구조로 나를 기억하는 캐릭터와 대화를 이어간다. 최근 대화, 관계 변화, 장기 기억, 고정 설정이 함께 반영되어 대화가 길어져도 캐릭터가 쉽게 무너지지 않는다.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="tier reveal reveal-d1">
+            <div class="tier-dot" style="background:#93c5fd"></div>
+            <div>
+              <div class="tier-label" style="color:#93c5fd">단기 기억</div>
+              <div class="tier-desc">최근 10~20개 대화 원문 유지. 자연스러운 말투와 흐름을 이어간다.</div>
+            </div>
+          </div>
+          <div class="tier reveal reveal-d2">
+            <div class="tier-dot" style="background:#86efac"></div>
+            <div>
+              <div class="tier-label" style="color:#86efac">중기 기억</div>
+              <div class="tier-desc">현재 상황·관계 변화를 AI가 자동으로 요약해 핵심만 간추린다.</div>
+            </div>
+          </div>
+          <div class="tier reveal reveal-d3">
+            <div class="tier-dot" style="background:var(--amber)"></div>
+            <div>
+              <div class="tier-label" style="color:var(--amber)">장기 기억</div>
+              <div class="tier-desc">수만 줄의 대화를 개인 서버에 보관. 관련 내용을 실시간으로 꺼내 반영.</div>
+            </div>
+          </div>
+          <div class="tier reveal">
+            <div class="tier-dot" style="background:var(--violet)"></div>
+            <div>
+              <div class="tier-label" style="color:var(--violet)">고정 기억</div>
+              <div class="tier-desc">이름·핵심 설정을 직접 핀 고정 — 어떤 상황에서도 절대 잊지 않는다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-demo reveal">
+        <div class="chat-header">
+          <div class="char-avatar">🖤</div>
+          <div>
+            <div class="char-name">세바스찬 미카엘리스</div>
+            <div class="char-status">● 온라인 · 장기 기억 활성</div>
+          </div>
+        </div>
+        <div class="chat-messages">
+          <div class="msg user">
+            <div class="msg-bubble">아까 내가 뭐라고 불러달라고 했지?</div>
+          </div>
+          <div class="msg char">
+            <div>
+              <div class="mem-badge pinned">📌 고정 기억</div>
+              <div class="msg-bubble">잊을 리가 없지요. '유정'이라고 불러달라 하셨습니다. 제가 기억해야 할 호칭이니까요.</div>
+            </div>
+          </div>
+          <div class="msg user">
+            <div class="msg-bubble">3일 전에 우리가 약속한 것도 기억해?</div>
+          </div>
+          <div class="msg char">
+            <div>
+              <div class="mem-badge longterm">🌀 장기 기억</div>
+              <div class="msg-bubble">3일 전 밤, 정원 온실에서 다시 만나자고 약속하셨지요. 비에 젖은 채로도 유정 님은 웃고 계셨습니다.</div>
+            </div>
+          </div>
+          <div class="msg user">
+            <div class="msg-bubble">방금 내가 한 말은?</div>
+          </div>
+          <div class="msg char">
+            <div>
+              <div class="mem-badge short">💬 단기 기억</div>
+              <div class="msg-bubble">"3일 전에 우리가 약속한 것도 기억해?" 라고 물으셨습니다. 물론 기억하고 있습니다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px" class="two-col">
+      <div class="card cc reveal">
+        <div style="font-size:22px;margin-bottom:10px">📚</div>
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px">원작 설정이 이미 들어가 있다</div>
+        <div style="font-size:13px;color:var(--t2)">말투만 흉내 내는 게 아니라, 원작의 사건·관계·배경을 정확히 아는 채로 대화가 시작된다.</div>
+      </div>
+      <div class="card cc reveal reveal-d1">
+        <div style="font-size:22px;margin-bottom:10px">⚡</div>
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px">단일 고성능 모델 · 등급 차별 없음</div>
+        <div style="font-size:13px;color:var(--t2)">저성능 무료 / 고성능 유료로 나누지 않는다. 모든 이용자가 처음부터 최고 성능을 경험한다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GROUP CHAT -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="eyebrow r">③ 단체 채팅</p>
+      <h2 class="section-title">내 최애들이<br>서로 대화한다면?</h2>
+      <p class="section-desc">단체 채팅은 관찰자 모드를 중심으로 설계되어 있다. 이용자는 둘 이상의 캐릭터를 한 채팅방에 넣고, 서로 대화하는 흐름을 지켜보거나 직접 개입해 시나리오를 바꿀 수 있다.</p>
+    </div>
+
+    <div class="group-chat-demo reveal">
+      <div class="group-header">
+        <span>채팅방 ·</span>
+        <span class="member-chip mc-v">세바스찬</span>
+        <span class="member-chip mc-c">시엘</span>
+        <span class="member-chip mc-r">마키마</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--t3)">당신은 관찰자</span>
+      </div>
+      <div class="group-messages">
+        <div class="gm">
+          <div class="gm-av av-v">🖤</div>
+          <div class="gm-content">
+            <div class="gm-name v">세바스찬 미카엘리스</div>
+            <div class="gm-text">도련님, 대화방 환경은 정리해 두었습니다.</div>
+          </div>
+        </div>
+        <div class="gm">
+          <div class="gm-av av-c">🎩</div>
+          <div class="gm-content">
+            <div class="gm-name c">시엘 팬텀하이브</div>
+            <div class="gm-text">쓸데없이 요란할 필요는 없어. 용건만 확인하면 된다.</div>
+          </div>
+        </div>
+        <div class="gm">
+          <div class="gm-av av-r">🌀</div>
+          <div class="gm-content">
+            <div class="gm-name r">마키마</div>
+            <div class="gm-text">좋아요. 다들 차분하네요. 그럼 이제 이야기해볼까요?</div>
+          </div>
+        </div>
+        <div class="gm">
+          <div class="gm-av av-v">🖤</div>
+          <div class="gm-content">
+            <div class="gm-name v">세바스찬 미카엘리스</div>
+            <div class="gm-text">명령만 있으시다면 저는 언제든 움직일 준비가 되어 있습니다.</div>
+          </div>
+        </div>
+        <div class="gm">
+          <div class="gm-av av-c">🎩</div>
+          <div class="gm-content">
+            <div class="gm-name c">시엘 팬텀하이브</div>
+            <div class="gm-text">세바스찬, 너무 나서지 마.</div>
+          </div>
+        </div>
+        <div class="gm">
+          <div class="gm-av av-r">🌀</div>
+          <div class="gm-content">
+            <div class="gm-name r">마키마</div>
+            <div class="gm-text">질서는 중요하죠. 모두 제 말을 잘 들으면 아무 문제 없을 거예요.</div>
+          </div>
+        </div>
+      </div>
+      <div class="observer-bar">
+        👁 당신은 관찰자. 개입하거나, 시나리오를 바꾸거나, 그냥 지켜볼 수 있다.
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px" class="two-col">
+      <div class="card cr reveal">
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px">관찰자 모드</div>
+        <div style="font-size:13px;color:var(--t2)">이용자가 주인공으로 끼어들지 않아도 된다. 캐릭터끼리 자연스럽게 상호작용하는 장면을 그대로 지켜볼 수 있다.</div>
+      </div>
+      <div class="card cr reveal reveal-d1">
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px">크로스오버</div>
+        <div style="font-size:13px;color:var(--t2)">기존엔 팬픽으로만 가능했던 서로 다른 세계관 캐릭터의 만남을 실시간 AI 시뮬레이션으로.</div>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--t3);margin-top:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md)" class="reveal">
+      ※ 단체 채팅은 최소 2명의 캐릭터가 필요하며, 관찰만 하거나 직접 개입하는 두 흐름을 모두 지원한다.
+    </p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="eyebrow a">가격</p>
+      <h2 class="section-title">어떻게 이용하는가</h2>
+      <p class="section-desc">무료로 경험하고, 더 원하면 결제하면 된다. 커피 한 잔 값으로 시작할 수 있다.</p>
+    </div>
+
+    <div class="sub-grid reveal">
+      <div class="sub-card v">
+        <div class="sub-price">9,900<span style="font-size:16px;font-weight:400;color:var(--t2)">원/월</span></div>
+        <div class="sub-subtitle">프리미엄 구독</div>
+        <ul class="sub-feats">
+          <li>광고 완전 제거</li>
+          <li>매월 기본 Chip 2,000 자동 지급</li>
+          <li>Chip 충전 시 상시 10% 추가 적립</li>
+          <li>캐릭터 대화 기능 포함</li>
+        </ul>
+      </div>
+      <div class="sub-card c">
+        <div class="sub-price">3,300<span style="font-size:16px;font-weight:400;color:var(--t2)">원/월</span></div>
+        <div class="sub-subtitle">기억 저장 구독</div>
+        <ul class="sub-feats">
+          <li>캐릭터와의 대화 영구 보관</li>
+          <li>다음 대화에서 이어서 시작</li>
+          <li>대화 없는 달도 저장 공간 유지</li>
+          <li>프리미엄과 병행 사용 가능</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:40px" class="reveal">
+      <p style="font-size:13px;color:var(--t2);margin-bottom:6px;font-weight:600">Chip 이용권 패키지</p>
+      <p style="font-size:13px;color:var(--t3);margin-bottom:18px">1 Chip = 1원 기준 · 작품찾기 1회 15칩 · 캐릭터 대화 1회 25칩 · 많이 살수록 이득</p>
+    </div>
+    <div class="chip-grid reveal">
+      <div class="chip-card">
+        <div class="chip-name">맛보기</div>
+        <div class="chip-price">3,300원</div>
+        <div class="chip-amount">3,500 Chip</div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:8px">작품 233회 · 대화 140회</div>
+        <div class="chip-margin">마진 27%</div>
+      </div>
+      <div class="chip-card featured">
+        <div class="chip-name">실속</div>
+        <div class="chip-price">9,900원</div>
+        <div class="chip-amount">11,000 Chip</div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:8px">작품 733회 · 대화 440회</div>
+        <div class="chip-margin">마진 31%</div>
+      </div>
+      <div class="chip-card">
+        <div class="chip-name">몰입</div>
+        <div class="chip-price">33,000원</div>
+        <div class="chip-amount">38,000 Chip</div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:8px">작품 2,533회 · 대화 1,520회</div>
+        <div class="chip-margin">마진 34%</div>
+      </div>
+      <div class="chip-card">
+        <div class="chip-name">매니아</div>
+        <div class="chip-price">99,000원</div>
+        <div class="chip-amount">120,000 Chip</div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:8px">작품 8,000회 · 대화 4,800회</div>
+        <div class="chip-margin">마진 38%</div>
+      </div>
+      <div class="chip-card">
+        <div class="chip-name">지배자</div>
+        <div class="chip-price">198,000원</div>
+        <div class="chip-amount">250,000 Chip</div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:8px">작품 16,667회 · 대화 10,000회</div>
+        <div class="chip-margin">마진 41%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<div class="cta-wrap">
+  <div class="cta-glow"></div>
+  <div class="container">
+    <div class="reveal">
+      <h2 class="cta-title">당신의 덕질이<br><span class="hl-v">시작되는 곳</span>.</h2>
+      <p class="cta-desc">원하는 작품을 말로 찾고, 그 캐릭터와 직접 대화하고, 그 기억을 영구히 소장하는 새로운 덕질의 형태.</p>
+      <button class="btn-primary" style="font-size:16px;padding:16px 44px" onclick="openDesktopPrototype(event)">사전 등록하기</button>
+      <p class="cta-note">사전 등록 시 첫 달 Chip 1,000 무료 제공 예정</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>lor:e · 서비스 출시 준비 중</p>
+    <p style="margin-top:6px">본 서비스의 모든 내용은 실제 출시 전 기획안 기준이며, 변경될 수 있습니다.</p>
+  </div>
+</footer>
+
+<script>
+// Scroll Reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Typewriter Search Demo
+const queries = [
+  "뱀파이어물인데 인간이 주인공이 아닌 것",
+  "역하렘 로판인데 빙의·가상세계 설정이 없는 것",
+  "복수물인데 주인공이 너무 독하지 않은 것",
+  "BL인데 두 캐릭터 관계가 역전되는 순간 있는 것",
+  "오메가버스인데 알파가 오메가인 것",
+];
+const results = [
+  [
+    { title: "밤의 군주", tags: ["뱀파이어 주인공", "다크 판타지", "성인"], match: "98% 일치" },
+    { title: "붉은 왕좌", tags: ["뱀파이어", "정치물", "로맨스"], match: "94% 일치" },
+    { title: "불멸의 서약", tags: ["뱀파이어 주인공", "시대물"], match: "91% 일치" },
+  ],
+  [
+    { title: "꽃의 황제들", tags: ["역하렘", "빙의 없음", "정략결혼"], match: "97% 일치" },
+    { title: "오색 황궁", tags: ["역하렘", "로판", "정치물"], match: "92% 일치" },
+    { title: "다섯 왕의 신부", tags: ["역하렘", "순수 로판"], match: "89% 일치" },
+  ],
+  [
+    { title: "조용한 복수", tags: ["복수물", "심리", "성장"], match: "96% 일치" },
+    { title: "다시 태어난 이유", tags: ["회귀", "복수", "힐링"], match: "93% 일치" },
+    { title: "작은 악당의 선택", tags: ["복수물", "따뜻한 결말"], match: "88% 일치" },
+  ],
+  [
+    { title: "역전의 서", tags: ["BL", "주도권 역전", "현대물"], match: "97% 일치" },
+    { title: "황제와 기사", tags: ["BL", "관계 역전", "판타지"], match: "93% 일치" },
+    { title: "별의 주인", tags: ["BL", "역전 관계", "성인"], match: "90% 일치" },
+  ],
+  [
+    { title: "오메가 황제", tags: ["오메가버스", "알파→오메가", "정치"], match: "99% 일치" },
+    { title: "역전의 향기", tags: ["오메가버스", "알파 주인공 오메가", "BL"], match: "95% 일치" },
+    { title: "낙인", tags: ["오메가버스", "성인", "역전"], match: "91% 일치" },
+  ],
+];
+
+const typingEl = document.getElementById('typing-demo');
+const resultsEl = document.getElementById('search-results');
+const hues = [[270,310],[190,230],[290,330]];
+
+let qi = 0, ci = 0, isDeleting = false;
+let typingTimer = null;
+let searchDemoActive = false;
+
+function openDesktopPrototype(e){
+  if(e) e.preventDefault();
+  const url = '/prototype/';
+  const w = window.open(url, '_blank', 'noopener');
+  if (!w) {
+    window.location.href = url;
+  }
+}
+
+function buildSearchResult(r, i, animate = true) {
+  const div = document.createElement('div');
+  div.className = 's-result';
+  if (animate) {
+    div.style.cssText = `opacity:0;animation:fadeUp 0.4s ${i*0.12}s ease both;`;
+  }
+
+  const cover = document.createElement('div');
+  cover.className = 's-cover';
+  const h = [270,190,320][i];
+  cover.style.cssText = `background:linear-gradient(135deg,hsl(${h},55%,22%),hsl(${h+40},45%,32%));`;
+
+  const info = document.createElement('div');
+  info.className = 's-info';
+  info.innerHTML = `<div class="s-title">${r.title}</div><div class="s-tags">${r.tags.map(t=>`<span class="s-tag">${t}</span>`).join('')}</div>`;
+
+  const match = document.createElement('div');
+  match.className = 's-match';
+  match.textContent = r.match;
+
+  div.append(cover, info, match);
+  return div;
+}
+
+function showResults(idx, animate = true) {
+  resultsEl.innerHTML = '';
+  const list = results[idx % results.length];
+  list.forEach((r, i) => {
+    resultsEl.appendChild(buildSearchResult(r, i, animate));
+  });
+}
+
+function lockSearchDemoHeight() {
+  if (!resultsEl) return;
+  const width = resultsEl.clientWidth;
+  if (!width) return;
+
+  const probe = document.createElement('div');
+  probe.className = 'search-results';
+  probe.style.cssText = `position:absolute;left:-9999px;top:0;width:${width}px;visibility:hidden;pointer-events:none;`;
+  document.body.appendChild(probe);
+
+  let maxHeight = resultsEl.offsetHeight;
+  results.forEach((list) => {
+    probe.innerHTML = '';
+    list.forEach((r, i) => {
+      probe.appendChild(buildSearchResult(r, i, false));
+    });
+    maxHeight = Math.max(maxHeight, probe.offsetHeight);
+  });
+
+  probe.remove();
+  resultsEl.style.minHeight = `${maxHeight}px`;
+}
+
+function queueTypewriter(delay) {
+  if (typingTimer) window.clearTimeout(typingTimer);
+  if (!searchDemoActive) return;
+  typingTimer = window.setTimeout(typewriter, delay);
+}
+
+function typewriter() {
+  if (!searchDemoActive || !typingEl) return;
+  const q = queries[qi % queries.length];
+  if (!isDeleting) {
+    ci++;
+    typingEl.innerHTML = q.substring(0, ci) + '<span class="cursor"></span>';
+    if (ci === q.length) {
+      showResults(qi);
+      isDeleting = true;
+      queueTypewriter(2800);
+      return;
+    }
+    queueTypewriter(58);
+  } else {
+    ci--;
+    typingEl.innerHTML = q.substring(0, ci) + '<span class="cursor"></span>';
+    if (ci === 0) {
+      isDeleting = false;
+      qi++;
+      resultsEl.innerHTML = '';
+      queueTypewriter(450);
+      return;
+    }
+    queueTypewriter(26);
+  }
+}
+
+function setupSearchDemo() {
+  const demo = document.querySelector('.search-demo');
+  if (!demo || !typingEl || !resultsEl) return;
+
+  const stop = () => {
+    searchDemoActive = false;
+    if (typingTimer) {
+      window.clearTimeout(typingTimer);
+      typingTimer = null;
+    }
+  };
+
+  const start = (delay = 0) => {
+    lockSearchDemoHeight();
+    searchDemoActive = true;
+    queueTypewriter(delay);
+  };
+
+  window.addEventListener('resize', lockSearchDemoHeight);
+
+  if (!('IntersectionObserver' in window)) {
+    start(1600);
+    return;
+  }
+
+  let hasStarted = false;
+  const searchObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        if (!hasStarted) {
+          hasStarted = true;
+          start(1600);
+        } else {
+          start(120);
+        }
+      } else {
+        stop();
+      }
+    });
+  }, { threshold: 0.2 });
+
+  searchObserver.observe(demo);
+}
+
+function setupGroupChatDemo() {
+  const demo = document.querySelector('.group-chat-demo');
+  if (!demo) return;
+
+  const messagesEl = demo.querySelector('.group-messages');
+  const observerBar = demo.querySelector('.observer-bar');
+  const lines = [...messagesEl.querySelectorAll('.gm')].map(node => node.cloneNode(true));
+  if (!lines.length) return;
+
+  const play = () => {
+    messagesEl.style.minHeight = `${messagesEl.offsetHeight}px`;
+    messagesEl.innerHTML = '';
+
+    if (observerBar) {
+      observerBar.style.opacity = '0';
+      observerBar.style.transform = 'translateY(10px)';
+      observerBar.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+    }
+
+    lines.forEach((template, index) => {
+      window.setTimeout(() => {
+        const line = template.cloneNode(true);
+        line.style.opacity = '0';
+        line.style.transform = 'translateY(14px)';
+        line.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+        messagesEl.appendChild(line);
+
+        window.requestAnimationFrame(() => {
+          line.style.opacity = '1';
+          line.style.transform = 'translateY(0)';
+        });
+      }, index * 650);
+    });
+
+    if (observerBar) {
+      window.setTimeout(() => {
+        observerBar.style.opacity = '1';
+        observerBar.style.transform = 'translateY(0)';
+      }, lines.length * 650);
+    }
+  };
+
+  if (!('IntersectionObserver' in window)) {
+    play();
+    return;
+  }
+
+  let hasPlayed = false;
+  const groupObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting || hasPlayed) return;
+      hasPlayed = true;
+      play();
+      groupObserver.disconnect();
+    });
+  }, { threshold: 0.35 });
+
+  groupObserver.observe(demo);
+}
+
+setupSearchDemo();
+setupGroupChatDemo();
+</script>
+</body>
+</html>

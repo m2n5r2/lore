@@ -1,0 +1,573 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lor:e 지원제도 매칭 리포트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080711;
+  --panel:#12101f;
+  --panel2:#191529;
+  --line:rgba(219,210,255,.14);
+  --line2:rgba(103,232,249,.24);
+  --text:#f4f1ff;
+  --muted:#bdb5d7;
+  --dim:#81779f;
+  --violet:#c4b5fd;
+  --deep:#7c3aed;
+  --cyan:#67e8f9;
+  --pink:#fb7185;
+  --amber:#fbbf24;
+  --green:#86efac;
+  --font-title:'Black Han Sans', sans-serif;
+  --font-body:'Noto Sans KR', sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 8% -4%, rgba(124,58,237,.34), transparent 28rem),
+    radial-gradient(circle at 92% 4%, rgba(103,232,249,.18), transparent 24rem),
+    linear-gradient(180deg,#080711 0%,#0c0916 42%,#090711 100%);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.72;
+  word-break:keep-all;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:44px 26px 72px}
+.hero{
+  position:relative;
+  padding:46px 44px 42px;
+  border:1px solid var(--line);
+  border-radius:30px;
+  background:linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  box-shadow:0 28px 90px rgba(0,0,0,.34);
+  overflow:hidden;
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  width:260px;height:260px;right:-70px;top:-84px;border-radius:50%;
+  background:radial-gradient(circle,rgba(103,232,249,.34),rgba(124,58,237,.14) 52%,transparent 70%);
+  filter:blur(.2px);
+}
+.kicker{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--cyan);font-weight:800;font-size:13px;letter-spacing:.02em}
+.kicker span{padding:6px 12px;border-radius:999px;background:rgba(103,232,249,.1);border:1px solid rgba(103,232,249,.2)}
+h1{font-family:var(--font-body);font-weight:300;font-size:clamp(42px,7vw,84px);line-height:1.06;letter-spacing:-.07em;margin:22px 0 18px}
+h1 em{font-style:normal;font-weight:500;background:linear-gradient(135deg,var(--violet),var(--cyan));-webkit-background-clip:text;color:transparent}
+.lead{max-width:820px;color:var(--muted);font-size:18px;line-height:1.82;margin:0}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px;position:relative;z-index:1}
+.meta-card{padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(8,7,17,.54)}
+.meta-card strong{display:block;font-size:12px;color:var(--dim);margin-bottom:4px}
+.meta-card span{font-weight:900;color:var(--text)}
+.section{margin-top:34px}
+.section-title{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin:0 0 16px}
+h2{font-size:28px;line-height:1.24;margin:0;letter-spacing:-.04em}
+.hint{color:var(--dim);font-size:13px}
+.badge{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:rgba(196,181,253,.12);color:var(--violet);font-size:12px;font-weight:900}
+.badge.cyan{background:rgba(103,232,249,.1);color:var(--cyan)}
+.badge.green{background:rgba(134,239,172,.1);color:var(--green)}
+.badge.amber{background:rgba(251,191,36,.12);color:var(--amber)}
+.badge.pink{background:rgba(251,113,133,.12);color:var(--pink)}
+.program-list{display:grid;gap:22px}
+.unified-card{
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:28px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.03)),
+    rgba(18,16,31,.78);
+  box-shadow:0 18px 70px rgba(0,0,0,.18);
+}
+.unified-card.open{border-color:rgba(134,239,172,.36)}
+.unified-card.soon{border-color:rgba(251,191,36,.42)}
+.unified-card.closed{border-color:rgba(251,113,133,.28)}
+.unified-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:22px}
+.unified-kicker{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.state{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 12px;border-radius:999px;
+  font-size:12px;font-weight:900;letter-spacing:-.01em;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);
+}
+.state.open{color:var(--green);background:rgba(134,239,172,.1);border-color:rgba(134,239,172,.24)}
+.state.always{color:var(--cyan);background:rgba(103,232,249,.1);border-color:rgba(103,232,249,.24)}
+.state.soon{color:var(--amber);background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.26)}
+.state.closed{color:var(--pink);background:rgba(251,113,133,.1);border-color:rgba(251,113,133,.22)}
+.todo-strip{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin:0 0 22px;
+}
+.todo{
+  border:1px solid rgba(103,232,249,.22);
+  border-radius:20px;
+  padding:18px;
+  background:linear-gradient(180deg,rgba(103,232,249,.08),rgba(255,255,255,.035));
+}
+.todo strong{display:block;color:var(--text);font-size:16px;line-height:1.35;margin-bottom:8px}
+.todo span{color:var(--muted);font-size:13px;line-height:1.65}
+.group-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:18px 0 -4px;
+  color:var(--text);
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:-.03em;
+}
+.group-title:after{content:"";height:1px;flex:1;background:rgba(255,255,255,.1)}
+.unified-card h3{font-size:30px;line-height:1.2;margin:0;letter-spacing:-.05em}
+.unified-card .summary{margin:10px 0 0;color:var(--muted);font-size:16px;line-height:1.78;max-width:760px}
+.priority-mark{
+  flex:0 0 auto;
+  min-width:118px;
+  text-align:center;
+  border-radius:18px;
+  padding:12px 14px;
+  background:rgba(8,7,17,.6);
+  border:1px solid rgba(255,255,255,.09);
+}
+.priority-mark strong{display:block;font-size:22px;line-height:1;color:var(--text)}
+.priority-mark span{display:block;margin-top:4px;color:var(--dim);font-size:12px;font-weight:800}
+.unified-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.info-panel{
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.085);
+  background:rgba(8,7,17,.48);
+  padding:18px;
+}
+.panel-title{color:var(--cyan);font-size:13px;font-weight:900;margin-bottom:10px}
+.info-table{display:grid;gap:10px}
+.info-row{display:grid;grid-template-columns:108px 1fr;gap:12px;padding-bottom:9px;border-bottom:1px solid rgba(255,255,255,.07)}
+.info-row:last-child{border-bottom:0;padding-bottom:0}
+.info-row span{color:var(--dim);font-size:13px;font-weight:900}
+.info-row strong{color:var(--text);font-size:14px;line-height:1.65}
+.info-row a{color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
+.criteria{margin:0;padding-left:18px;color:var(--muted)}
+.criteria li{margin:7px 0;line-height:1.72}
+.action-line{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.08)}
+.action-line p{margin:0;color:var(--muted);line-height:1.7}
+.action-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:11px 16px;border-radius:999px;
+  background:linear-gradient(135deg,var(--violet),var(--cyan));
+  color:#07060e;font-size:13px;font-weight:900;
+}
+.action-btn.secondary{background:rgba(255,255,255,.075);color:var(--cyan);border:1px solid rgba(103,232,249,.24)}
+.source-inline{color:var(--cyan);text-decoration:underline;text-underline-offset:3px;font-weight:900}
+.reference-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+.ref-card{
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:18px;
+  background:rgba(255,255,255,.045);
+}
+.ref-card.wide{grid-column:1/-1}
+.ref-card.closed{border-color:rgba(251,113,133,.22)}
+.ref-card.soon{border-color:rgba(251,191,36,.28)}
+.ref-card h3{font-size:20px;line-height:1.32;margin:12px 0 8px;letter-spacing:-.03em}
+.ref-card p{margin:0;color:var(--muted);line-height:1.72;font-size:14px}
+.ref-kicker{display:flex;flex-wrap:wrap;gap:8px}
+.ref-meta{display:grid;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+.ref-row{display:grid;grid-template-columns:82px 1fr;gap:10px;color:var(--muted);font-size:13px;line-height:1.65}
+.ref-row span{color:var(--dim);font-weight:900}
+.ref-row strong{color:var(--text);font-weight:800}
+.ref-row a{color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
+.short-list{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.short-item{
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;
+  padding:13px 14px;
+  background:rgba(255,255,255,.035);
+}
+.short-item strong{display:block;color:var(--text);font-size:14px;line-height:1.35;margin-bottom:4px}
+.short-item span{display:block;color:var(--muted);font-size:12px;line-height:1.55}
+.sources{
+  border-top:1px solid var(--line);
+  margin-top:42px;
+  padding-top:22px;
+  color:var(--dim);
+  font-size:13px;
+  line-height:1.9;
+}
+.source-note{margin:0 0 14px;color:var(--muted);line-height:1.9}
+.sources a{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:900px){
+  .wrap{padding:22px 14px 52px}
+  .hero{padding:34px 24px}
+  .meta,.unified-grid,.todo-strip,.reference-grid,.short-list{grid-template-columns:1fr}
+  .unified-head{display:block}
+  .priority-mark{margin-top:16px;text-align:left}
+  .info-row,.ref-row{grid-template-columns:1fr}
+}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#080711}
+  .wrap{max-width:none;padding:18mm}
+  .hero,.unified-card,.ref-card{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <div class="kicker">
+      <span>lor:e</span>
+      <span>AI 콘텐츠 탐색 + 캐릭터 대화 서비스</span>
+      <span>지원제도 매칭 리포트</span>
+    </div>
+    <h1>이 서비스는<br><em>콘텐츠 스타트업 지원</em>에<br>가장 잘 맞는다</h1>
+    <p class="lead">
+      lor:e는 단순 앱 서비스가 아니라 콘텐츠 IP, 자연어 추천, 캐릭터 AI, 이용자 취향 데이터가 결합된
+      콘텐츠 기술형 플랫폼이다.<br>
+      따라서 일반 창업지원보다 <strong>콘텐츠 스타트업, 문화기술 R&amp;D, AI 바우처, 창업패키지</strong>를
+      조합하는 방식이 가장 현실적이다.
+    </p>
+    <div class="meta">
+      <div class="meta-card"><strong>작성 기준</strong><span>2026.04.29 현재</span></div>
+      <div class="meta-card"><strong>지원자 조건</strong><span>23세 여성 대학생</span></div>
+      <div class="meta-card"><strong>우선 분야</strong><span>콘텐츠 + AI + IP</span></div>
+      <div class="meta-card"><strong>1차 목표</strong><span>사업화 자금·멘토링 확보</span></div>
+    </div>
+  </section>
+
+  <section class="section program-dashboard">
+    <div class="section-title">
+      <h2>이번 주 실행 순서와 핵심 카드</h2>
+      <div class="hint">2026.04.29 기준 · 진행중/예정 공고와 상시 상담을 분리</div>
+    </div>
+
+    <div class="todo-strip">
+      <div class="todo">
+        <strong>1. 5월 4일 전 신청 패키지 완성</strong>
+        <span>미래여성경제인육성사업용 아이디어 요약, 서비스 화면, IP 후보 목록을 먼저 만든다.</span>
+      </div>
+      <div class="todo">
+        <strong>2. 상담 2곳 예약</strong>
+        <span>K-Startup 원스톱과 명지대 창업상담에서 저작권, 개인정보, 팀 지분 질문을 확인한다.</span>
+      </div>
+      <div class="todo">
+        <strong>3. GCON 사전진단으로 포지셔닝 확인</strong>
+        <span>콘텐츠 IP + AI 추천 플랫폼으로 설명해도 되는지 상담에서 검증한다.</span>
+      </div>
+    </div>
+
+    <div class="program-list">
+      <div class="group-title">마감일 있는 진행중·예정 공고</div>
+
+      <article class="unified-card soon">
+        <div class="unified-head">
+          <div>
+            <div class="unified-kicker">
+              <span class="state soon">접수 예정</span>
+              <span class="badge pink">여학생·IP</span>
+            </div>
+            <h3>미래여성경제인육성사업 창업아이디어 멘토링·IP권리화</h3>
+            <p class="summary">23세 여성 대학생, 사업자등록 전 단계에 가장 잘 맞는 제도다. 사업화 자금보다 창업 멘토링, 사업계획서 정리, 지식재산권 출원 경험을 먼저 확보하는 데 적합하다.</p>
+          </div>
+          <div class="priority-mark"><strong>1순위</strong><span>지금 준비</span></div>
+        </div>
+        <div class="unified-grid">
+          <div class="info-panel">
+            <div class="panel-title">공고 상태·경쟁률·근거</div>
+            <div class="info-table">
+              <div class="info-row"><span>현재 상태</span><strong>2026.05.04 ~ 2026.05.17 접수 예정</strong></div>
+              <div class="info-row"><span>지원 대상</span><strong>전국 고교·대학교·대학원 재학 여학생. 휴학생·졸업유예자 가능, 졸업생 제외</strong></div>
+              <div class="info-row"><span>경쟁률</span><strong>경쟁률형 선발보다 선착순·프로그램형 성격. 2026년 총 800건 내외 접수, 우수 아이디어 30건 장려금·IP 출원 지원</strong></div>
+              <div class="info-row"><span>근거</span><strong><a href="https://www.wbiz.or.kr/notice/bizNewDetail.do?nttId=927" target="_blank">2026 KWBIZ 공식 공고</a></strong></div>
+              <div class="info-row"><span>서비스 적합성</span><strong>lor:e 로고, 서비스명, 캐릭터 대화 구조, 추천 방식 등을 IP 권리화 후보로 정리 가능</strong></div>
+            </div>
+          </div>
+          <div class="info-panel">
+            <div class="panel-title">이번 주 준비 기준</div>
+            <ul class="criteria">
+              <li>아이디어 요약 1장, 서비스 화면 캡처, IP 후보 목록을 먼저 만든다.</li>
+              <li>AI 콘텐츠 검색과 캐릭터 대화가 어떤 사용자 문제를 해결하는지 한 문장으로 정리한다.</li>
+              <li>상표, UI, 데이터 구조, 캐릭터 대화 기억 구조 중 무엇을 권리화할지 정한다.</li>
+              <li>지원서에는 “성인 콘텐츠”보다 “합법 콘텐츠 탐색과 팬 경험 확장”을 앞세운다.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="action-line">
+          <p>지금 할 일: 5월 4일 전까지 신청서 초안, 화면 캡처, IP 후보 목록을 완성한다.</p>
+          <a class="action-btn" href="https://www.wbiz.or.kr/notice/bizNewDetail.do?nttId=927" target="_blank">공식 공고 보기</a>
+        </div>
+      </article>
+
+      <div class="group-title">상시 가능 상담·플랫폼</div>
+
+      <article class="unified-card open">
+        <div class="unified-head">
+          <div>
+            <div class="unified-kicker">
+              <span class="state always">상시 가능</span>
+              <span class="badge amber">법률·지재권</span>
+            </div>
+            <h3>K-Startup 원스톱 지원센터</h3>
+            <p class="summary">지원금 자체보다 법률, 지재권, 개인정보, 투자유치, 창업지원사업 상담을 받는 보조 제도다. lor:e처럼 저작권·19세 콘텐츠·대화기억 저장 이슈가 있는 서비스는 먼저 상담을 받아두는 편이 안전하다.</p>
+          </div>
+          <div class="priority-mark"><strong>즉시</strong><span>상담 예약</span></div>
+        </div>
+        <div class="unified-grid">
+          <div class="info-panel">
+            <div class="panel-title">상담 상태·근거</div>
+            <div class="info-table">
+              <div class="info-row"><span>현재 상태</span><strong>상시 상담 가능</strong></div>
+              <div class="info-row"><span>지원 대상</span><strong>예비창업자, 초기창업자, 창업기업</strong></div>
+              <div class="info-row"><span>경쟁률</span><strong>선발형 지원금이 아니라 상담형 제도라 경쟁률 개념 없음</strong></div>
+              <div class="info-row"><span>근거</span><strong><a href="https://www.k-startup.go.kr/onestop" target="_blank">K-Startup 원스톱 지원센터</a></strong></div>
+              <div class="info-row"><span>서비스 적합성</span><strong>저작권, 개인정보, 주주간계약서, 지원사업 선택 상담에 적합</strong></div>
+            </div>
+          </div>
+          <div class="info-panel">
+            <div class="panel-title">상담 전 질문</div>
+            <ul class="criteria">
+              <li>캐릭터 AI가 원작 무단 복제처럼 보이지 않도록 설명 문장을 정리한다.</li>
+              <li>대화기억 저장, 개인정보 처리, 미성년자 접근 정책을 질문 목록으로 만든다.</li>
+              <li>기술 공동창업자 지분, 베스팅, 클리프, 주주간계약서 질문을 준비한다.</li>
+              <li>상담 때 서비스 설명 1장과 프로토타입 링크를 함께 제시한다.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="action-line">
+          <p>지원사업 신청 전 리스크를 줄이는 안전장치로 쓰기 좋다.</p>
+          <a class="action-btn" href="https://www.k-startup.go.kr/onestop" target="_blank">상담 신청</a>
+        </div>
+      </article>
+
+      <article class="unified-card open">
+        <div class="unified-head">
+          <div>
+            <div class="unified-kicker">
+              <span class="state always">상시 가능</span>
+              <span class="badge cyan">교내 창업</span>
+            </div>
+            <h3>명지대학교 창업지원: 창업상담·창업보육센터</h3>
+            <p class="summary">교내 창업동아리 모집은 마감됐지만, 창업상담과 창업보육센터 안내는 계속 활용할 수 있다. 외부 지원사업 전에 사업계획서와 IP·팀 구성 리스크를 다듬는 데 유리하다.</p>
+          </div>
+          <div class="priority-mark"><strong>즉시</strong><span>교내 상담</span></div>
+        </div>
+        <div class="unified-grid">
+          <div class="info-panel">
+            <div class="panel-title">상담 상태·근거</div>
+            <div class="info-table">
+              <div class="info-row"><span>현재 상태</span><strong>창업동아리 2026.03.16 ~ 03.22 접수 마감. 창업상담은 상시 활용 가능</strong></div>
+              <div class="info-row"><span>지원 대상</span><strong>명지대 재학생·휴학생, 예비창업자, 초기창업자</strong></div>
+              <div class="info-row"><span>경쟁률</span><strong>창업동아리 공식 경쟁률 미공개. 창업상담은 경쟁률 개념 없음</strong></div>
+              <div class="info-row"><span>근거</span><strong><a href="https://startup.mju.ac.kr/" target="_blank">명지대 창업교육센터</a></strong></div>
+              <div class="info-row"><span>연락처</span><strong>인문 02-300-1538 / startup1123@mju.ac.kr · 자연 031-330-6144 / 20190319@mju.ac.kr</strong></div>
+              <div class="info-row"><span>서비스 적합성</span><strong>과제용 발표, 사업계획서, 지재권 상담, 정부지원사업 연결에 적합</strong></div>
+            </div>
+          </div>
+          <div class="info-panel">
+            <div class="panel-title">상담 전 준비</div>
+            <ul class="criteria">
+              <li>사업계획서 초안과 프로토타입 링크를 함께 보여준다.</li>
+              <li>AI 활용 창업, 시제품 제작, 지재권 출원 계획을 정리한다.</li>
+              <li>교내에서 받을 수 있는 발표 피드백, 팀 구성, 멘토링 루트를 묻는다.</li>
+              <li>창업보육센터는 입주 후 사업자등록과 공간 사용 계획을 확인한다.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="action-line">
+          <p>이번 주에는 교내 상담 일정을 잡고, 다음 창업동아리·교내 프로그램 공고를 기다리는 흐름이 맞다.</p>
+          <a class="action-btn" href="https://startup.mju.ac.kr/" target="_blank">창업교육센터 보기</a>
+        </div>
+      </article>
+
+      <article class="unified-card open">
+        <div class="unified-head">
+          <div>
+            <div class="unified-kicker">
+              <span class="state always">상시 가능</span>
+              <span class="badge amber">지역 콘텐츠</span>
+            </div>
+            <h3>경기콘텐츠진흥원 / GCON 스타트업 플랫폼</h3>
+            <p class="summary">경기도 기반 콘텐츠·AI 스타트업이라면 사전진단, 상담, 입주공간, 투자연계 프로그램을 검토할 수 있다. 개별 입주공고는 마감·모집중 상태가 계속 바뀌므로 플랫폼에서 확인하는 방식이 맞다.</p>
+          </div>
+          <div class="priority-mark"><strong>즉시</strong><span>사전진단</span></div>
+        </div>
+        <div class="unified-grid">
+          <div class="info-panel">
+            <div class="panel-title">상담 상태·근거</div>
+            <div class="info-table">
+              <div class="info-row"><span>현재 상태</span><strong>GCON 스타트업 플랫폼 사전진단·상담 가능. 입주/지원사업은 개별 공고 확인 필요</strong></div>
+              <div class="info-row"><span>지원 대상</span><strong>콘텐츠 IP, 융복합 콘텐츠, AI 기술 활용 콘텐츠 기업·예비창업자</strong></div>
+              <div class="info-row"><span>경쟁률</span><strong>공식 경쟁률은 대부분 미공개. 입주공간은 모집 좌석·실 수에 따라 편차 큼</strong></div>
+              <div class="info-row"><span>근거</span><strong><a href="https://gcon-startup.com/startup/intro/" target="_blank">GCON 스타트업 플랫폼</a></strong></div>
+              <div class="info-row"><span>서비스 적합성</span><strong>콘텐츠 IP와 AI를 결합한 플랫폼으로 설명하면 적합</strong></div>
+            </div>
+          </div>
+          <div class="info-panel">
+            <div class="panel-title">상담 전 준비</div>
+            <ul class="criteria">
+              <li>콘텐츠+ICT, AI 활용 융복합 콘텐츠라는 설명을 준비한다.</li>
+              <li>사무공간, 멘토링, 투자상담을 어떻게 활용할지 계획한다.</li>
+              <li>예비창업자는 입주 후 사업자등록 가능성도 확인한다.</li>
+              <li>프로토타입 링크와 발표자료를 상담 전에 준비한다.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="action-line">
+          <p>상담부터 받고, 맞는 입주·지원 공고가 열릴 때 들어가는 방식이 현실적이다.</p>
+          <a class="action-btn" href="https://gcon-startup.com/startup/intro/" target="_blank">GCON 사전진단</a>
+        </div>
+      </article>
+
+      <div class="group-title">추가 확인할 대학생 창업 프로젝트</div>
+      <div class="reference-grid">
+        <article class="ref-card wide">
+          <div class="ref-kicker"><span class="state open">지원 가능</span><span class="badge cyan">에브리타임 협업</span></div>
+          <h3>에브리타임 x 모두의 창업 프로젝트</h3>
+          <p>중소벤처기업부의 「모두의 창업 프로젝트」와 에브리타임이 연결된 대학생 창업 참여 경로다. 아이디어만 있어도 창업 도전자로 지원할 수 있는 창업인재 육성 플랫폼 성격이라, lor:e처럼 아직 법인·매출 전 단계인 아이템도 확인할 가치가 있다.</p>
+          <div class="ref-meta">
+            <div class="ref-row"><span>에브리타임</span><strong><a href="https://everytime.kr/event/startup-campaign" target="_blank">이벤트 경유 지원</a> · 네이버페이 1만원권 200명 추첨, 최다 지원자 학교 커피차 무료배달 혜택 확인</strong></div>
+            <div class="ref-row"><span>직접 지원</span><strong><a href="https://www.modoo.or.kr/" target="_blank">모두의 창업 공식 지원 페이지</a></strong></div>
+            <div class="ref-row"><span>근거</span><strong><a href="https://m.korea.kr/briefing/pressReleaseView.do?newsId=156751217" target="_blank">중기부 보도자료</a> · <a href="https://www.vinuteam.com/" target="_blank">비누팀/에브리타임 협업 소개</a></strong></div>
+            <div class="ref-row"><span>활용 기준</span><strong>가능하면 에브리타임 경유로 들어가 이벤트 혜택을 챙기고, 접속이 안 되면 modoo.or.kr에서 바로 지원</strong></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="group-title">마감됐지만 다음 모집 대비할 참고 카드</div>
+      <div class="reference-grid">
+        <article class="ref-card closed">
+          <div class="ref-kicker"><span class="state closed">2026 본공고 마감</span><span class="badge cyan">콘텐츠 사업화</span></div>
+          <h3>KOCCA 콘텐츠 스타트업 지원사업</h3>
+          <p>lor:e와 가장 정체성이 잘 맞는 대형 사업화 카드다. 올해는 마감됐으므로 다음 모집 대비 사업계획서의 중심축으로 둔다.</p>
+          <div class="ref-meta">
+            <div class="ref-row"><span>상태</span><strong>2026.03.20 ~ 2026.04.08 접수 마감</strong></div>
+            <div class="ref-row"><span>경쟁률</span><strong>공식 경쟁률 확인 어려움. 2026년 총 42개 과제 선발 구조</strong></div>
+            <div class="ref-row"><span>근거</span><strong><a href="https://welcon.kocca.kr/ko/info/business/1957370" target="_blank">2026 KOCCA 공고 요약</a></strong></div>
+            <div class="ref-row"><span>다음 행동</span><strong>합법 콘텐츠 탐색성, 프로토타입, 검색 성공 사례를 정리</strong></div>
+          </div>
+        </article>
+
+        <article class="ref-card closed">
+          <div class="ref-kicker"><span class="state closed">마감</span><span class="badge">예비창업</span></div>
+          <h3>예비창업패키지</h3>
+          <p>사업자등록 전 예비창업자에게 가장 대표적인 초기 사업화 자금 제도다. 다음 모집 전 사용자 테스트 지표가 필요하다.</p>
+          <div class="ref-meta">
+            <div class="ref-row"><span>상태</span><strong>2026.02.27 ~ 2026.03.26 접수 마감</strong></div>
+            <div class="ref-row"><span>경쟁률</span><strong>2025년 서울과기대 예비창업패키지 11.9:1 <a href="https://it.donga.com/107136/" target="_blank">출처</a></strong></div>
+            <div class="ref-row"><span>근거</span><strong><a href="https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?pbancClssCd=PBC010&amp;schM=view&amp;pbancSn=176458" target="_blank">K-Startup 공고 페이지</a></strong></div>
+            <div class="ref-row"><span>다음 행동</span><strong>문제인식, 실현가능성, 성장전략, 팀 구성을 4개 항목으로 정리</strong></div>
+          </div>
+        </article>
+
+        <article class="ref-card closed">
+          <div class="ref-kicker"><span class="state closed">마감</span><span class="badge pink">여성창업</span></div>
+          <h3>여성창업경진대회</h3>
+          <p>여성 예비창업자 조건을 직접 활용할 수 있지만, 최근 경쟁 강도가 높아 발표 완성도와 기술혁신성 근거가 중요하다.</p>
+          <div class="ref-meta">
+            <div class="ref-row"><span>상태</span><strong>2026.03.12 ~ 2026.04.16 접수 마감</strong></div>
+            <div class="ref-row"><span>경쟁률</span><strong>2025년 28:1 <a href="https://www.newsis.com/view/NISX20250704_0003239281" target="_blank">출처</a> · 2026년 39:1 <a href="https://www.asiae.co.kr/article/2026042809281739354" target="_blank">출처</a></strong></div>
+            <div class="ref-row"><span>근거</span><strong><a href="https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&amp;pbancSn=176490&amp;pbancEndYn=N" target="_blank">K-Startup 공고 페이지</a></strong></div>
+            <div class="ref-row"><span>다음 행동</span><strong>3분 피치, 기술혁신성, 도전! K-스타트업 연계 가능성 정리</strong></div>
+          </div>
+        </article>
+
+        <article class="ref-card closed">
+          <div class="ref-kicker"><span class="state closed">마감</span><span class="badge cyan">대학 기반</span></div>
+          <h3>창업중심대학</h3>
+          <p>대학 인프라를 활용하는 예비·초기 창업 지원이다. 올해 주요 접수는 끝났으므로 교내 상담에서 추천 루트를 확인한다.</p>
+          <div class="ref-meta">
+            <div class="ref-row"><span>상태</span><strong>2026.03.03 ~ 2026.03.24 접수 마감</strong></div>
+            <div class="ref-row"><span>경쟁률</span><strong>2024년 강원권 공개 사례 7:1 <a href="https://www.ajunews.com/view/20240403133030013" target="_blank">출처</a></strong></div>
+            <div class="ref-row"><span>근거</span><strong><a href="https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&amp;pbancSn=176498&amp;pbancEndYn=N" target="_blank">K-Startup 공고 페이지</a></strong></div>
+            <div class="ref-row"><span>다음 행동</span><strong>대학 인프라를 왜 써야 하는지와 시제품 검증 계획을 정리</strong></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="group-title">창업 후 또는 기술팀 확보 후 볼 보조 카드</div>
+      <div class="reference-grid">
+        <article class="ref-card wide">
+          <div class="ref-kicker"><span class="state closed">후속 검토</span><span class="badge green">창업 후·기술팀 후</span></div>
+          <h3>지금은 읽기만 해도 되는 후속 제도</h3>
+          <p>AI 청년창업기업 동반성장 바우처, 초기창업패키지, 청년창업사관학교, 문화체육관광 R&amp;D, AI 통합 바우처, CKL기업지원센터는 지금 당장 신청할 핵심 카드가 아니다. 법인 설립, 기술팀, MVP 지표, 외부 납품 가능한 솔루션이 생긴 뒤 다시 본다.</p>
+          <div class="ref-meta">
+            <div class="ref-row"><span>확인처</span><strong><a href="https://nxt.nipa.kr/" target="_blank">NIPA</a> · <a href="https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do" target="_blank">K-Startup</a> · <a href="https://www.iris.go.kr/" target="_blank">IRIS</a> · <a href="https://pms.kocca.kr/" target="_blank">KOCCA PMS</a></strong></div>
+            <div class="ref-row"><span>판단 기준</span><strong>지금은 신청 준비보다 미래여성경제인육성사업, 상시 상담, GCON 사전진단에 시간을 쓰는 편이 낫다.</strong></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="group-title">삭제 전 후보 제도 짧은 목록</div>
+      <div class="short-list">
+        <div class="short-item"><strong>미래여성경제인육성사업</strong><span>여학생 예비창업자에게 맞는 멘토링·IP 권리화 카드. 지금 가장 먼저 준비할 제도.</span></div>
+        <div class="short-item"><strong>K-Startup 원스톱 지원센터</strong><span>지원금보다 법률, 지재권, 개인정보, 팀 계약 리스크를 확인하는 상시 상담 창구.</span></div>
+        <div class="short-item"><strong>명지대학교 창업교육센터·창업상담</strong><span>교내 발표자료, 사업계획서, 창업동아리, 멘토링 루트를 확인할 상시 활용 카드.</span></div>
+        <div class="short-item"><strong>GCON 스타트업 플랫폼</strong><span>콘텐츠 IP와 AI 플랫폼 포지셔닝을 상담하고, 맞는 입주·지원 공고를 찾는 경기도 기반 창구.</span></div>
+        <div class="short-item"><strong>에브리타임 x 모두의 창업 프로젝트</strong><span>에브리타임 경유 지원 시 네이버페이 추첨·학교 커피차 혜택이 있는 대학생 창업 참여 경로.</span></div>
+        <div class="short-item"><strong>KOCCA 콘텐츠 스타트업 지원사업</strong><span>lor:e 정체성과 가장 잘 맞는 콘텐츠 사업화 카드. 올해는 마감, 다음 모집 대비.</span></div>
+        <div class="short-item"><strong>예비창업패키지</strong><span>사업자등록 전 초기 사업화 자금 제도. 다음 모집 전 MVP와 사용자 검증 지표가 필요.</span></div>
+        <div class="short-item"><strong>여성창업경진대회</strong><span>여성 예비창업자 조건을 활용할 수 있는 경진대회. 경쟁률이 높아 발표 완성도가 중요.</span></div>
+        <div class="short-item"><strong>창업중심대학</strong><span>대학 인프라와 시제품 검증을 활용하는 예비·초기 창업 지원. 올해 주요 접수는 마감.</span></div>
+        <div class="short-item"><strong>AI 청년창업기업 동반성장 바우처 공급기업 POOL</strong><span>AI 솔루션을 외부 기업에 공급할 수준이 된 뒤 검토할 후속 카드.</span></div>
+        <div class="short-item"><strong>초기창업패키지</strong><span>법인 설립 후 3년 이내 기업용 사업화 자금. 지금보다 창업 후 지표가 생겼을 때 적합.</span></div>
+        <div class="short-item"><strong>청년창업사관학교</strong><span>청년 창업자에게 자금, 공간, 교육, 코칭을 묶어 지원. 기술기반 창업성과 실행력을 강하게 봄.</span></div>
+        <div class="short-item"><strong>문화체육관광 연구개발사업</strong><span>콘텐츠 검색·추천을 R&amp;D 과제로 재정의할 때 적합. 기술팀과 연구계획서가 먼저 필요.</span></div>
+        <div class="short-item"><strong>AI 통합 바우처</strong><span>AI 솔루션 도입·공급 구조의 바우처. lor:e가 추천·대화 솔루션으로 제품화된 뒤 검토.</span></div>
+        <div class="short-item"><strong>오픈소스 AI·SW 개발·활용 지원사업</strong><span>AI·SW 오픈소스 활용 또는 공개 계획이 있어야 하는 기술개발형 제도.</span></div>
+        <div class="short-item"><strong>신산업 분야 오픈소스 사업화 지원사업</strong><span>오픈소스 기반 제품을 신산업에 적용·사업화하는 카드. 법인과 사업화 구조가 필요.</span></div>
+        <div class="short-item"><strong>CKL기업지원센터 입주기업</strong><span>콘텐츠 스타트업의 사무공간·제작 인프라 지원. 법인 설립 후 공간이 필요할 때 확인.</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="sources">
+    <strong>참고한 출처</strong><br>
+    <p class="source-note">
+      신청·접수 근거는 공식 포털 중심으로 정리했고,<br>
+      경쟁률 수치가 필요한 카드에는 해당 숫자 바로 옆에 기사·보도자료 출처를 붙였다.<br>
+      일부 사업은 접수기간 전에는 신청 버튼이 비활성화될 수 있고,<br>
+      로그인 후 공고 검색 또는 신청서 작성 화면이 표시될 수 있다.
+    </p>
+    한국콘텐츠진흥원 PMS 신청접수,<br>
+    K-Startup 사업공고 신청 페이지,<br>
+    IRIS 연구과제 접수 시스템,<br>
+    NIPA 사업관리시스템,<br>
+    여성기업종합정보포털 KWBIZ,<br>
+    명지대학교 창업교육센터 및 창업보육센터,<br>
+    경기콘텐츠진흥원 스타트업 플랫폼,<br>
+    에브리타임 x 모두의 창업 프로젝트,<br>
+    모두의 창업 공식 지원 페이지,<br>
+    K-Startup 원스톱 지원센터.
+    <br><br>
+    <a href="https://pms.kocca.kr/" target="_blank">KOCCA PMS 신청접수</a> ·
+    <a href="https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do" target="_blank">K-Startup 모집공고</a> ·
+    <a href="https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?pbancClssCd=PBC010&amp;schM=view&amp;pbancSn=176458" target="_blank">예비창업패키지 신청</a> ·
+    <a href="https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&amp;pbancSn=176490&amp;pbancEndYn=N" target="_blank">여성창업경진대회 신청</a> ·
+    <a href="https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&amp;pbancSn=176498&amp;pbancEndYn=N" target="_blank">창업중심대학 신청</a> ·
+    <a href="https://www.kwbiz.or.kr/" target="_blank">KWBIZ 온라인 신청</a> ·
+    <a href="https://www.iris.go.kr/" target="_blank">IRIS 연구과제 접수</a> ·
+    <a href="https://nxt.nipa.kr/" target="_blank">NIPA 사업관리시스템</a> ·
+    <a href="https://startup.mju.ac.kr/" target="_blank">명지대 창업교육센터</a> ·
+    <a href="https://gcon-startup.com/startup/intro/" target="_blank">GCON 사전진단</a> ·
+    <a href="https://everytime.kr/event/startup-campaign" target="_blank">에브리타임 x 모두의 창업</a> ·
+    <a href="https://www.modoo.or.kr/" target="_blank">모두의 창업 직접 지원</a> ·
+    <a href="https://m.korea.kr/briefing/pressReleaseView.do?newsId=156751217" target="_blank">중기부 모두의 창업 보도자료</a> ·
+    <a href="https://www.k-startup.go.kr/onestop" target="_blank">K-Startup 원스톱 지원센터</a>
+  </section>
+</main>
+</body>
+</html>
+
+

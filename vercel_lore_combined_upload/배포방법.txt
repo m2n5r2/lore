@@ -1,0 +1,20 @@
+Vercel 배포용 폴더입니다.
+
+구조
+- index.html: 랜딩페이지
+- prototype/index.html: 최신 프로토타입
+- prototype/assets/characters: 캐릭터 이미지
+- api/gemini.js: Gemini API 키를 숨겨서 호출하는 Vercel Function
+- vercel.json: Vercel 함수 실행 시간 설정
+
+배포 후 해야 할 일
+1. Vercel 프로젝트의 Environment Variables에 GEMINI_API_KEY를 추가합니다.
+2. Production, Preview에 모두 적용되게 체크합니다.
+3. 환경변수 저장 후 다시 배포합니다.
+
+확인 주소
+- 랜딩페이지: https://배포주소/
+- 프로토타입: https://배포주소/prototype/
+- 함수 확인: https://배포주소/api/gemini
+
+함수 확인 주소에서 POST only 메시지가 나오면 함수 배포 자체는 정상입니다.

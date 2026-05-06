@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "api/gemini.js": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/prototype/mobile",
+      "destination": "/prototype/mobile/index.html"
+    },
+    {
+      "source": "/prototype",
+      "destination": "/prototype/index.html"
+    }
+  ]
+}

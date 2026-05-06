@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>lor:e — 서비스 개발 로드맵</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f5ff;
+  --bg2: #ffffff;
+  --bg3: #f0edff;
+  --sur: rgba(124,58,237,0.05);
+  --sur2: rgba(124,58,237,0.09);
+  --bdr: rgba(124,58,237,0.14);
+  --bdr2: rgba(124,58,237,0.28);
+  --t1: #0d0b1e;
+  --t2: #5e5880;
+  --t3: #9b96b4;
+  --v: #7c3aed;       /* violet — darker for light bg */
+  --vm: rgba(124,58,237,0.18);
+  --vd: rgba(124,58,237,0.07);
+  --vl: #c4b5fd;      /* violet light */
+  --c: #0891b2;       /* cyan */
+  --cm: rgba(8,145,178,0.18);
+  --cd: rgba(8,145,178,0.07);
+  --r: #e11d48;
+  --rm: rgba(225,29,72,0.18);
+  --rd: rgba(225,29,72,0.07);
+  --a: #d97706;
+  --am: rgba(217,119,6,0.18);
+  --ad: rgba(217,119,6,0.07);
+  --g: #059669;
+  --gm: rgba(5,150,105,0.18);
+  --gd: rgba(5,150,105,0.07);
+  --ffd: 'Black Han Sans', sans-serif;
+  --ffb: 'Noto Sans KR', sans-serif;
+  --r8: 8px; --r14: 14px; --r22: 22px; --rpill: 100px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:var(--ffb);font-size:14px;line-height:1.7;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* ── BG ORBS (very subtle for light mode) ── */
+.bg-orbs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);will-change:transform}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.09) 0%,transparent 70%);top:-150px;left:-100px;animation:drift1 24s ease-in-out infinite}
+.orb2{width:480px;height:480px;background:radial-gradient(circle,rgba(8,145,178,0.07) 0%,transparent 70%);top:40%;right:-120px;animation:drift2 30s ease-in-out infinite}
+.orb3{width:340px;height:340px;background:radial-gradient(circle,rgba(124,58,237,0.05) 0%,transparent 70%);bottom:20%;left:10%;animation:drift3 20s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0)}33%{transform:translate(50px,40px)}66%{transform:translate(-30px,65px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-60px,45px)}}
+@keyframes drift3{0%,100%{transform:translate(0,0)}40%{transform:translate(45px,-50px)}}
+
+/* ── SIDEBAR NAV (full-height, flush left, collapsible) ── */
+:root{ --sn-w:260px; }
+
+.sidenav{
+  position:fixed;left:0;top:0;height:100vh;width:var(--sn-w);
+  background:rgba(252,251,255,0.97);
+  backdrop-filter:blur(24px);
+  border-right:1px solid var(--bdr);
+  box-shadow:4px 0 32px rgba(124,58,237,0.08);
+  display:flex;flex-direction:column;overflow:hidden;
+  z-index:200;
+  transition:transform .38s cubic-bezier(.4,0,.2,1);
+}
+body.sn-closed .sidenav{ transform:translateX(calc(-1 * var(--sn-w))); }
+
+/* toggle ring button */
+.sn-toggle{
+  position:fixed;top:50%;
+  left:calc(var(--sn-w) - 18px);
+  transform:translateY(-50%);
+  z-index:300;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg2);
+  border:2px solid var(--v);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:left .38s cubic-bezier(.4,0,.2,1), box-shadow .2s, border-color .2s;
+  box-shadow:0 2px 14px rgba(124,58,237,0.18);
+  flex-shrink:0;
+}
+.sn-toggle:hover{
+  border-color:var(--c);
+  box-shadow:0 4px 20px rgba(124,58,237,0.28);
+}
+body.sn-closed .sn-toggle{ left:10px; }
+.sn-toggle-ic{
+  font-size:13px;color:var(--v);
+  transition:transform .38s cubic-bezier(.4,0,.2,1);
+  line-height:1;
+}
+body.sn-closed .sn-toggle-ic{ transform:rotate(180deg); }
+
+/* sidebar branding header */
+.sn-header{
+  padding:28px 22px 20px;
+  border-bottom:1px solid var(--bdr);
+  background:linear-gradient(160deg,rgba(124,58,237,0.06),rgba(8,145,178,0.03));
+  cursor:pointer;flex-shrink:0;
+}
+.sn-header:hover{background:linear-gradient(160deg,rgba(124,58,237,0.1),rgba(8,145,178,0.06))}
+.sn-logo{
+  font-family:var(--ffd);font-size:38px;line-height:1;letter-spacing:-.01em;
+  background:linear-gradient(135deg,var(--v),var(--c));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:5px;
+}
+.sn-sub{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+
+/* progress */
+.sn-progress-wrap{padding:16px 22px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.sn-progress-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.sn-progress-label span:first-child{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+.sn-progress-pct{font-size:12px;font-weight:700;color:var(--v)}
+.sn-progress-track{height:3px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.sn-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--v),var(--c));width:0%;transition:width .3s ease}
+
+/* toc */
+.sn-toc{padding:12px 14px;display:flex;flex-direction:column;gap:3px;flex:1;overflow-y:auto}
+.sn-link{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 12px;border-radius:14px;
+  background:none;border:none;cursor:pointer;
+  transition:all .22s;text-align:left;width:100%;
+  font-family:var(--ffb);
+}
+.sn-link,.btn-p,.btn-s,.sn-cta{touch-action:manipulation}
+.sn-link:hover{background:var(--vd)}
+.sn-link.active{background:var(--vd)}
+.sn-num{
+  font-family:var(--ffd);font-size:22px;line-height:1;
+  color:rgba(124,58,237,0.15);flex-shrink:0;width:32px;text-align:right;
+  transition:all .22s;
+}
+.sn-link:hover .sn-num,.sn-link.active .sn-num{
+  background:linear-gradient(135deg,var(--v),var(--c));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.sn-text{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.sn-title{font-size:14px;font-weight:500;color:var(--t2);line-height:1.3;transition:color .2s}
+.sn-link:hover .sn-title,.sn-link.active .sn-title{color:var(--v);font-weight:700}
+.sn-hint{font-size:11px;color:var(--t3);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-link.active .sn-hint{color:rgba(124,58,237,0.5)}
+.sn-dot{width:7px;height:7px;border-radius:50%;background:rgba(124,58,237,0.15);flex-shrink:0;transition:all .22s;margin-left:auto}
+.sn-link:hover .sn-dot{background:var(--vm)}
+.sn-link.active .sn-dot{background:var(--v);box-shadow:0 0 0 3px var(--vd)}
+
+/* footer cta */
+.sn-footer{padding:16px 18px 24px;border-top:1px solid var(--bdr);flex-shrink:0}
+.sn-cta{
+  display:block;width:100%;padding:13px 18px;border-radius:var(--rpill);
+  background:linear-gradient(135deg,var(--v),var(--c));
+  color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;
+  transition:all .22s;font-family:var(--ffb);text-align:center;letter-spacing:.02em;
+}
+.sn-cta:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 8px 28px rgba(124,58,237,0.3)}
+
+/* ── PAGE BODY (shifts with sidebar) ── */
+.page-body{
+  margin-left:var(--sn-w);
+  transition:margin-left .38s cubic-bezier(.4,0,.2,1);
+}
+body.sn-closed .page-body{ margin-left:0; }
+
+
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 44px}
+
+/* ── SHARED ── */
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.eyebrow.v{color:var(--v)}.eyebrow.c{color:var(--c)}.eyebrow.r{color:var(--r)}.eyebrow.a{color:var(--a)}.eyebrow.g{color:var(--g)}.eyebrow.dim{color:var(--t3)}
+.sec-title{font-family:var(--ffb);font-weight:200;font-size:clamp(26px,3.5vw,40px);line-height:1.2;margin-bottom:14px;letter-spacing:-.02em}
+.sec-desc{font-size:15px;color:var(--t2);line-height:1.9;max-width:600px;margin-bottom:40px}
+.hlv{color:var(--v)}.hlc{color:var(--c)}.hlr{color:var(--r)}.hla{color:var(--a)}.hlg{color:var(--g)}
+
+section{padding:80px 0;position:relative;z-index:10}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--bdr),transparent);position:relative;z-index:10}
+
+/* pill badges */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:var(--rpill);font-size:12px;font-weight:500;border:1px solid}
+.pill .dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.pv{border-color:var(--vm);background:var(--vd);color:var(--v)}
+.pc{border-color:var(--cm);background:var(--cd);color:var(--c)}
+.pr{border-color:var(--rm);background:var(--rd);color:var(--r)}
+.pa{border-color:var(--am);background:var(--ad);color:var(--a)}
+.pg{border-color:var(--gm);background:var(--gd);color:var(--g)}
+
+/* cards */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r14);padding:22px 24px;transition:all .25s}
+.card:hover{border-color:var(--bdr2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(124,58,237,0.08)}
+.card.cv:hover{border-color:var(--vm)}
+.card.cc:hover{border-color:var(--cm)}
+
+/* stat number */
+.bignum{font-family:var(--ffb);font-weight:200;font-size:clamp(32px,4vw,52px);letter-spacing:-.03em;line-height:1}
+
+/* ── HERO ── */
+.hero{padding:100px 0 80px;min-height:88vh;display:flex;align-items:center}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--vd);border:1px solid var(--vm);color:var(--v);font-size:12px;font-weight:500;padding:6px 14px;border-radius:var(--rpill);margin-bottom:24px}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--v);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-logo{font-family:var(--ffd);font-size:clamp(72px,9vw,120px);line-height:.9;background:linear-gradient(135deg,var(--v),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.hero-tagline{font-weight:200;font-size:clamp(18px,2.5vw,28px);color:var(--t1);line-height:1.3;margin-bottom:20px;letter-spacing:-.02em}
+.hero-sub{font-size:14px;color:var(--t2);line-height:1.9;max-width:440px;margin-bottom:28px}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.hero-btns{display:flex;gap:10px}
+.btn-p{padding:11px 28px;border-radius:var(--rpill);background:linear-gradient(135deg,var(--v),var(--c));color:#fff;font-weight:700;font-size:14px;border:none;cursor:pointer;transition:all .25s;font-family:var(--ffb)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(124,58,237,0.3)}
+.btn-s{padding:11px 24px;border-radius:var(--rpill);background:transparent;color:var(--t2);font-size:14px;border:1px solid var(--bdr2);cursor:pointer;transition:all .2s;font-family:var(--ffb);display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.btn-s:hover{border-color:var(--vm);color:var(--v)}
+
+/* hero right — overview card */
+.hero-overview{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r22);overflow:hidden;box-shadow:0 20px 60px rgba(124,58,237,0.08)}
+.hero-ov-header{background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(8,145,178,0.06));padding:20px 24px;border-bottom:1px solid var(--bdr)}
+.hero-ov-title{font-weight:200;font-size:15px;color:var(--t1);margin-bottom:4px}
+.hero-ov-sub{font-size:12px;color:var(--t3)}
+.ov-row{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--bdr);cursor:default;transition:background .2s}
+.ov-row:last-child{border-bottom:none}
+.ov-row:hover{background:var(--vd)}
+.ov-step-num{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--c));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ov-row.dim .ov-step-num{background:var(--sur2);color:var(--t3)}
+.ov-body{flex:1;min-width:0}
+.ov-name{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px}
+.ov-row.dim .ov-name{color:var(--t2)}
+.ov-detail{font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ov-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--rpill);white-space:nowrap;flex-shrink:0}
+
+/* ── SECTION: WHY ── */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bdr);border-radius:var(--r22);overflow:hidden;margin-top:0}
+.why-cell{background:var(--bg2);padding:28px 28px;transition:background .2s}
+.why-cell:hover{background:var(--vd)}
+.why-num{font-family:var(--ffd);font-size:36px;background:linear-gradient(135deg,var(--v),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.why-title{font-size:15px;font-weight:600;color:var(--t1);margin-bottom:8px}
+.why-desc{font-size:13px;color:var(--t2);line-height:1.85}
+.why-quote{margin-top:12px;padding:10px 14px;background:var(--vd);border-left:2px solid var(--v);border-radius:0 var(--r8) var(--r8) 0;font-size:12px;color:var(--v);font-style:italic;line-height:1.7}
+
+/* ── SECTION: SERVICES ── */
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:0}
+.svc-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r22);overflow:hidden;transition:all .25s}
+.svc-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(124,58,237,0.1)}
+.svc-card.cv:hover{border-color:var(--vm)}
+.svc-card.cc:hover{border-color:var(--cm)}
+.svc-header{padding:22px 24px 18px;border-bottom:1px solid var(--bdr)}
+.svc-icon{width:40px;height:40px;border-radius:var(--r14);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.svc-icon.v{background:var(--vd);border:1px solid var(--vm)}
+.svc-icon.c{background:var(--cd);border:1px solid var(--cm)}
+.svc-name{font-size:17px;font-weight:600;margin-bottom:6px}
+.svc-desc{font-size:13px;color:var(--t2);line-height:1.75}
+.svc-items{padding:16px 24px;display:flex;flex-direction:column;gap:0}
+.svc-item{padding:12px 0;border-bottom:1px solid var(--bdr);display:flex;gap:10px;align-items:flex-start}
+.svc-item:last-child{border-bottom:none}
+.svc-item-ic{font-size:14px;flex-shrink:0;margin-top:1px}
+.svc-item-body{}
+.svc-item-title{font-size:13px;font-weight:500;margin-bottom:3px}
+.svc-item-desc{font-size:12px;color:var(--t2);line-height:1.65}
+.svc-footer{padding:14px 24px;background:var(--sur);border-top:1px solid var(--bdr);font-size:12px;font-weight:600}
+
+/* ── TECH STACK ── */
+.tech-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:32px}
+.tech-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r14);padding:16px 18px}
+.tech-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.tech-val{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.tech-sub{font-size:12px;color:var(--t2)}
+
+/* ── BENCHMARK ── */
+.bench-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:24px 0}
+.bench-stat{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r14);padding:20px 18px;text-align:center}
+.bench-val{font-weight:200;font-size:28px;letter-spacing:-.03em;margin-bottom:4px}
+.bench-sub{font-size:11px;color:var(--t3)}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bdr);border-radius:var(--r14);overflow:hidden;margin-top:16px}
+.compare-col{background:var(--bg2);padding:20px 20px}
+.compare-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.compare-items{display:flex;flex-direction:column;gap:8px}
+.compare-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.5}
+.compare-item.bad{color:var(--t3)}
+.compare-item.bad .ci-ic{color:var(--r)}
+.compare-item.good{color:var(--t1)}
+.compare-item.good .ci-ic{color:var(--g)}
+.ci-ic{flex-shrink:0;font-size:13px;margin-top:1px}
+
+/* ── REVENUE ── */
+.rev-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rev-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r22);overflow:hidden}
+.rev-card.dark-card{background:linear-gradient(135deg,rgba(124,58,237,0.06),rgba(8,145,178,0.04));border-color:var(--vm)}
+.rev-head{padding:20px 22px 16px;border-bottom:1px solid var(--bdr)}
+.rev-head.dark-head{border-color:var(--vm)}
+.rev-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.rev-sub{font-size:12px;color:var(--t2)}
+.rev-items-list{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.rev-item{padding:12px 14px;background:var(--vd);border-radius:var(--r8);border:1px solid var(--vm)}
+.rev-item.ci{background:var(--cd);border-color:var(--cm)}
+.rev-item.gi{background:var(--gd);border-color:var(--gm)}
+.rev-item-title{font-size:13px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.rev-item-desc{font-size:11px;color:var(--t2);line-height:1.6}
+.rev-price{font-size:12px;font-weight:700;padding:2px 8px;border-radius:var(--rpill);background:var(--v);color:#fff;flex-shrink:0}
+.rev-price.c{background:var(--c)}
+.rev-price.g{background:var(--g)}
+
+/* ── CHIP TABLE ── */
+.chip-table{border:1px solid var(--bdr);border-radius:var(--r14);overflow:hidden}
+.chip-th{display:grid;grid-template-columns:2fr 1fr 1.2fr 1.8fr .7fr;padding:11px 18px;background:var(--t1);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.chip-row{display:grid;grid-template-columns:2fr 1fr 1.2fr 1.8fr .7fr;padding:13px 18px;border-top:1px solid var(--bdr);background:var(--bg2);align-items:center;transition:background .15s}
+.chip-row:hover{background:var(--vd)}
+.chip-row.featured{background:linear-gradient(90deg,rgba(124,58,237,0.06),rgba(8,145,178,0.04));border-color:var(--vm)}
+.chip-name{font-size:13px;font-weight:600}
+.chip-price{font-size:13px;color:var(--t1)}
+.chip-chips{font-size:13px;color:var(--t1)}
+.chip-usage{font-size:11px;color:var(--t2)}
+.chip-margin{font-size:13px;font-weight:700;color:var(--v)}
+.chip-row.featured .chip-margin{color:var(--v)}
+
+/* ── MEMORY ── */
+.mem-layers{display:flex;flex-direction:column;gap:8px}
+.mem-layer{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:var(--r14);border:1px solid;transition:all .2s}
+.mem-layer:hover{transform:translateX(4px)}
+.ml-badge{padding:4px 12px;border-radius:var(--rpill);font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.ml-v{background:var(--vd);border-color:var(--vm);color:var(--v)}
+.ml-c{background:var(--cd);border-color:var(--cm);color:var(--c)}
+.ml-g{background:var(--gd);border-color:var(--gm);color:var(--g)}
+.ml-a{background:var(--ad);border-color:var(--am);color:var(--a)}
+.ml-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.ml-desc{font-size:12px;color:var(--t2);line-height:1.7}
+
+/* ── COPYRIGHT ── */
+.copy-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:0}
+.copy-col{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r22);overflow:hidden}
+.copy-col-head{padding:18px 22px 14px;border-bottom:1px solid var(--bdr)}
+.copy-status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--rpill);font-size:10px;font-weight:700;margin-bottom:10px}
+.copy-col-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.copy-col-sub{font-size:12px;color:var(--t2)}
+.copy-body{padding:14px 18px}
+.copy-step-flow{display:flex;flex-direction:column;gap:6px}
+.copy-step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--sur);border-radius:var(--r8);border:1px solid var(--bdr)}
+.copy-step-num{width:22px;height:22px;border-radius:50%;background:var(--g);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.copy-step-text{font-size:12px;color:var(--t2);line-height:1.6}
+
+/* ── ROADMAP PHASES ── */
+.phase-progress{display:flex;gap:3px;height:6px;border-radius:var(--rpill);overflow:hidden;margin-bottom:48px}
+.progress-seg{border-radius:var(--rpill);transition:flex .3s}
+
+.phases{display:flex;flex-direction:column;gap:0;border:1px solid var(--bdr);border-radius:var(--r22);overflow:hidden;background:var(--bg2)}
+.phase{display:grid;grid-template-columns:200px 1fr;border-bottom:1px solid var(--bdr)}
+.phase:last-child{border-bottom:none}
+.phase-left{padding:28px 24px;border-right:1px solid var(--bdr);display:flex;flex-direction:column;justify-content:flex-start}
+.phase-num-big{font-family:var(--ffd);font-size:52px;line-height:1;margin-bottom:4px;background:linear-gradient(135deg,var(--v),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.phase-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:8px;line-height:1.4}
+.phase-dur-pill{display:inline-flex;padding:4px 10px;border-radius:var(--rpill);font-size:11px;font-weight:700;border:1px solid;width:fit-content}
+
+.phase-right{padding:28px 28px}
+.phase-reason{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r8);padding:14px 16px;margin-bottom:18px}
+.phase-reason-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.phase-reason-body{font-size:12px;color:var(--t2);line-height:1.75}
+.phase-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.phase-card{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r8);padding:12px 14px}
+.phase-card-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.phase-card-val{font-size:18px;font-weight:700;margin-bottom:2px}
+.phase-card-sub{font-size:11px;color:var(--t2);line-height:1.5}
+.phase-note{padding:12px 14px;border-radius:var(--r8);border-left:3px solid;font-size:12px;font-weight:600;line-height:1.7;margin-top:12px}
+.phase-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+/* RECRUIT BOX */
+.recruit-box{background:linear-gradient(135deg,rgba(124,58,237,0.06),rgba(8,145,178,0.04));border:1px solid var(--vm);border-radius:var(--r14);padding:14px 16px;margin-bottom:12px}
+.recruit-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--v);margin-bottom:6px}
+.recruit-body{font-size:12px;color:var(--t2);line-height:1.7}
+
+/* timeline tags */
+.tl-tags{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.tl-tag-row{display:flex;align-items:flex-start;gap:8px}
+.tl-period{font-size:11px;font-weight:700;padding:3px 9px;border-radius:var(--rpill);flex-shrink:0;white-space:nowrap}
+.tl-tag-desc{font-size:12px;color:var(--t2);line-height:1.6;padding-top:2px}
+
+/* ── FINANCE ── */
+.finance-block{border:1px solid var(--bdr);border-radius:var(--r14);overflow:hidden;margin-bottom:14px}
+.finance-section-head{background:var(--sur);padding:8px 16px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.fin-row{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 16px;border-top:1px solid var(--bdr);background:var(--bg2);transition:background .15s}
+.fin-row:hover{background:var(--vd)}
+.fin-row.total-g{background:rgba(5,150,105,0.06);border-top:1px solid var(--gm)}
+.fin-row.total-r{background:rgba(225,29,72,0.06);border-top:1px solid var(--rm)}
+.fin-label{font-size:13px;color:var(--t1)}
+.fin-right{text-align:right}
+.fin-val{font-size:14px;font-weight:700}
+.fin-detail{font-size:11px;color:var(--t3);line-height:1.5;max-width:280px}
+
+.result-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.result-card{border:1px solid;border-radius:var(--r14);padding:16px 18px;text-align:center}
+.result-card.red{background:rgba(225,29,72,0.05);border-color:var(--rm)}
+.result-card.grn{background:rgba(5,150,105,0.05);border-color:var(--gm)}
+.result-label{font-size:11px;color:var(--t3);margin-bottom:4px}
+.result-val{font-size:22px;font-weight:700}
+
+/* ── LOYALTY ── */
+.loyalty-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.loyalty-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r22);padding:22px 20px;transition:all .25s}
+.loyalty-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(124,58,237,0.1);border-color:var(--vm)}
+.loyalty-icon{font-size:26px;margin-bottom:12px}
+.loyalty-title{font-size:14px;font-weight:600;margin-bottom:6px}
+.loyalty-desc{font-size:12px;color:var(--t2);line-height:1.75}
+
+/* ── SUMMARY ── */
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bdr);border-radius:var(--r22);overflow:hidden;margin-top:0}
+.sum-cell{background:var(--bg2);padding:28px 22px;transition:background .2s}
+.sum-cell:hover{background:var(--vd)}
+.sum-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.sum-val{font-weight:200;font-size:clamp(22px,2.5vw,32px);letter-spacing:-.03em;margin-bottom:6px;line-height:1.1}
+.sum-sub{font-size:11px;color:var(--t2);line-height:1.6}
+
+/* ── HIGHLIGHT BOX ── */
+.hi-box{padding:14px 16px;border-radius:var(--r8);border-left:3px solid;font-size:13px;line-height:1.75}
+.hi-v{background:var(--vd);border-color:var(--v);color:var(--v)}
+.hi-c{background:var(--cd);border-color:var(--c);color:var(--c)}
+.hi-g{background:var(--gd);border-color:var(--g);color:var(--g)}
+.hi-a{background:var(--ad);border-color:var(--a);color:var(--a)}
+.hi-r{background:var(--rd);border-color:var(--r);color:var(--r)}
+
+/* ── INFO NOTE ── */
+.note-box{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r8);padding:10px 14px;font-size:12px;color:var(--t2);line-height:1.65}
+
+/* ── PROTO CTA ── */
+.proto-cta-wrap{background:linear-gradient(135deg,rgba(124,58,237,0.07),rgba(8,145,178,0.05));border:1px solid var(--vm);border-radius:var(--r22);padding:32px 36px;display:flex;justify-content:space-between;align-items:center;gap:24px;margin:48px 0}
+.proto-cta-wrap:hover{box-shadow:0 12px 40px rgba(124,58,237,0.1)}
+.proto-cta-desc{font-size:13px;color:var(--t2)}
+
+/* ── FOOTER ── */
+footer{background:var(--t1);padding:32px 36px;display:flex;justify-content:space-between;align-items:center;gap:16px;position:relative;z-index:10}
+.footer-logo{font-family:var(--ffd);font-size:26px;background:linear-gradient(135deg,var(--vl),#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.footer-info{font-size:12px;color:rgba(255,255,255,.3)}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.rd1{transition-delay:.1s}.rd2{transition-delay:.2s}.rd3{transition-delay:.3s}.rd4{transition-delay:.4s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .5s ease both}
+
+/* ── MOBILE EDITION OVERRIDES ── */
+@media (max-width: 9999px){
+  :root{--mobile-nav-h:126px}
+  html{scroll-padding-top:calc(var(--mobile-nav-h) + 16px)}
+  body{
+    font-size:13px;
+    line-height:1.72;
+    word-break:keep-all;
+    overflow-wrap:anywhere;
+  }
+  .orb{filter:blur(56px);opacity:.75}
+  .orb1{width:360px;height:360px;top:-130px;left:-120px}
+  .orb2{width:300px;height:300px;right:-160px}
+  .orb3{display:none}
+
+  .sn-toggle{display:none}
+  body.sn-closed .sidenav{transform:none}
+  .sidenav{
+    left:0;right:0;top:0;width:100%;height:auto;
+    display:grid;
+    grid-template-columns:auto minmax(96px,1fr) auto;
+    grid-template-areas:
+      "brand progress cta"
+      "toc toc toc";
+    align-items:center;
+    border-right:0;
+    border-bottom:1px solid var(--bdr);
+    box-shadow:0 6px 28px rgba(124,58,237,.12);
+    overflow:hidden;
+  }
+  .sn-header{
+    grid-area:brand;
+    padding:10px 12px 8px 14px;
+    border-bottom:0;
+    background:transparent;
+  }
+  .sn-logo{font-size:31px;margin:0}
+  .sn-sub{display:none}
+  .sn-progress-wrap{
+    grid-area:progress;
+    padding:10px 8px 8px;
+    border-bottom:0;
+    min-width:0;
+  }
+  .sn-progress-label{margin-bottom:6px}
+  .sn-progress-label span:first-child{font-size:9px;letter-spacing:.05em}
+  .sn-progress-pct{font-size:11px}
+  .sn-footer{
+    grid-area:cta;
+    padding:8px 12px 8px 6px;
+    border-top:0;
+  }
+  .sn-cta{
+    min-height:38px;
+    padding:9px 12px;
+    font-size:12px;
+    line-height:1.2;
+    white-space:nowrap;
+  }
+  .sn-toc{
+    grid-area:toc;
+    flex-direction:row;
+    gap:8px;
+    padding:7px 12px 10px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    border-top:1px solid var(--bdr);
+    scrollbar-width:none;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+  }
+  .sn-toc::-webkit-scrollbar{display:none}
+  .sn-link{
+    flex:0 0 auto;
+    width:auto;
+    min-width:106px;
+    min-height:38px;
+    padding:8px 10px;
+    gap:7px;
+    border:1px solid var(--bdr);
+    border-radius:var(--rpill);
+    background:rgba(255,255,255,.72);
+    scroll-snap-align:start;
+  }
+  .sn-link.active{border-color:var(--vm);box-shadow:0 4px 18px rgba(124,58,237,.10)}
+  .sn-num{width:auto;font-size:16px;text-align:left}
+  .sn-title{font-size:12px;white-space:nowrap}
+  .sn-hint,.sn-dot{display:none}
+
+  .page-body,
+  body.sn-closed .page-body{
+    margin-left:0;
+    padding-top:var(--mobile-nav-h);
+  }
+  .wrap{max-width:none;padding:0 18px}
+  section{padding:48px 0}
+  section[id]{scroll-margin-top:calc(var(--mobile-nav-h) + 16px)}
+  .divider{margin:0 18px}
+  .sec-title{font-size:clamp(24px,7vw,32px);line-height:1.28;margin-bottom:12px}
+  .sec-desc{font-size:14px;line-height:1.85;max-width:100%;margin-bottom:26px}
+  .eyebrow{font-size:10px;margin-bottom:8px}
+
+  .hero{min-height:auto;padding:44px 0 54px;align-items:flex-start}
+  .hero-inner{grid-template-columns:1fr;gap:28px}
+  .hero-logo{font-size:clamp(58px,19vw,84px)}
+  .hero-tagline{font-size:clamp(20px,6vw,28px);line-height:1.34}
+  .hero-sub{max-width:100%;font-size:14px;line-height:1.82;margin-bottom:22px}
+  .hero-pills{gap:7px;margin-bottom:22px}
+  .pill{font-size:11px;padding:5px 10px}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .btn-p,.btn-s{width:100%;min-height:44px;padding:12px 18px}
+  .hero-overview{border-radius:18px}
+  .hero-ov-header{padding:17px 18px}
+  .ov-row{align-items:flex-start;padding:14px 16px;gap:10px}
+  .ov-step-num{width:26px;height:26px}
+  .ov-detail{white-space:normal;line-height:1.45}
+  .ov-tag{margin-left:auto}
+
+  .why-grid,
+  .svc-grid,
+  .tech-row,
+  .bench-grid,
+  .compare-grid,
+  .rev-layout,
+  .copy-cols,
+  .phase-cards,
+  .result-cards,
+  .loyalty-grid,
+  .summary-grid,
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns:repeat(3,1fr)"],
+  [style*="grid-template-columns:repeat(4,1fr)"]{
+    grid-template-columns:1fr!important;
+  }
+  .card,
+  .why-cell,
+  .svc-header,
+  .svc-items,
+  .tech-card,
+  .bench-stat,
+  .compare-col,
+  .rev-head,
+  .copy-col-head,
+  .copy-body,
+  .sum-cell,
+  .loyalty-card{
+    padding-left:18px;
+    padding-right:18px;
+  }
+  .card:hover,
+  .svc-card:hover,
+  .loyalty-card:hover{
+    transform:none;
+  }
+  .mem-layer{gap:10px;padding:14px 15px}
+  .ml-badge{font-size:10px;padding:4px 9px}
+
+  .chip-table{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .chip-th,.chip-row{
+    min-width:680px;
+    grid-template-columns:1.4fr .8fr 1fr 1.7fr .7fr;
+  }
+  .chip-th{padding:10px 14px}
+  .chip-row{padding:12px 14px}
+
+  .phase-progress{margin-bottom:28px}
+  .phases{border-radius:18px;overflow:visible;background:transparent;border:0;gap:14px}
+  .phase{
+    display:block;
+    background:var(--bg2);
+    border:1px solid var(--bdr);
+    border-radius:18px;
+    overflow:hidden;
+  }
+  .phase-left{
+    border-right:0;
+    border-bottom:1px solid var(--bdr);
+    padding:20px 18px 16px;
+    flex-direction:row;
+    align-items:flex-start;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .phase-num-big{font-size:42px;margin:0;line-height:.9}
+  .phase-name{font-size:14px;margin:0;flex:1;min-width:160px}
+  .phase-dur-pill{font-size:10px;margin-left:56px}
+  .phase-right{padding:18px}
+  .phase-reason{padding:13px 14px;margin-bottom:14px}
+  .phase-reason-body{font-size:12px;line-height:1.72}
+  .phase-card{padding:12px 13px}
+  .phase-card-val{font-size:16px}
+  .tl-tag-row{flex-direction:column;gap:5px}
+  .tl-period{width:max-content}
+
+  .finance-block{border-radius:12px}
+  .fin-row{flex-direction:column;gap:5px;padding:12px 14px}
+  .fin-right{text-align:left;width:100%}
+  .fin-detail{max-width:none}
+
+  .proto-cta-wrap{
+    margin:34px 0;
+    padding:22px 20px;
+    flex-direction:column;
+    align-items:stretch;
+    gap:16px;
+    border-radius:18px;
+  }
+  .proto-cta-wrap .btn-p{width:100%}
+  footer{
+    padding:26px 20px;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .reveal{
+    opacity:1!important;
+    transform:none!important;
+    transition:none!important;
+  }
+}
+
+@media (min-width: 861px){
+  body{
+    background:linear-gradient(135deg,#ede9fe 0%,#f8fafc 52%,#ecfeff 100%);
+  }
+  .bg-orbs{display:none}
+  .sidenav{
+    width:min(430px,100%);
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+  }
+  body.sn-closed .sidenav{
+    transform:translateX(-50%);
+  }
+  .page-body,
+  body.sn-closed .page-body{
+    width:min(430px,100%);
+    margin:0 auto;
+    background:var(--bg);
+    box-shadow:0 0 0 1px rgba(124,58,237,.08),0 24px 90px rgba(15,23,42,.16);
+    min-height:100vh;
+  }
+}
+
+@media (max-width: 520px){
+  :root{--mobile-nav-h:154px}
+  .sidenav{
+    grid-template-columns:auto 1fr;
+    grid-template-areas:
+      "brand cta"
+      "progress progress"
+      "toc toc";
+  }
+  .sn-progress-wrap{padding:2px 14px 7px}
+  .sn-footer{justify-self:end;padding-right:12px}
+  .sn-cta{font-size:11px;padding:8px 10px;max-width:132px}
+  .sn-link{min-width:96px;padding:8px 9px}
+  .sn-num{font-size:15px}
+  .sn-title{font-size:11px}
+  .wrap{padding:0 16px}
+  section{padding:42px 0}
+  .hero{padding-top:34px}
+  .hero-badge{font-size:11px;padding:6px 11px}
+  .hero-logo{font-size:58px}
+  .hero-tagline{font-size:22px}
+  .hero-overview{box-shadow:0 14px 42px rgba(124,58,237,.08)}
+  .ov-row{display:grid;grid-template-columns:28px 1fr;gap:9px}
+  .ov-tag{grid-column:2;margin-left:0;width:max-content}
+  .why-cell{padding:22px 18px}
+  .svc-card,
+  .rev-card,
+  .copy-col,
+  .loyalty-card,
+  .summary-grid,
+  .hero-overview{
+    border-radius:16px;
+  }
+  .phase-left{gap:10px}
+  .phase-num-big{font-size:38px}
+  .phase-name{min-width:120px}
+  .phase-dur-pill{margin-left:48px}
+  .note-box,.hi-box,.phase-note{font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<!-- SIDEBAR TOGGLE RING -->
+<button class="sn-toggle" id="sn-toggle" aria-label="목차 열고 닫기">
+  <span class="sn-toggle-ic">‹</span>
+</button>
+
+<!-- SIDEBAR NAV -->
+<aside class="sidenav">
+  <div class="sn-header" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <div class="sn-logo">lor:e</div>
+    <div class="sn-sub">서비스 개발 로드맵</div>
+  </div>
+  <div class="sn-progress-wrap">
+    <div class="sn-progress-label">
+      <span>읽기 진행도</span>
+      <span class="sn-progress-pct" id="sn-pct">0%</span>
+    </div>
+    <div class="sn-progress-track"><div class="sn-progress-fill" id="sn-fill"></div></div>
+  </div>
+  <div class="sn-toc">
+    <a href="#why" class="sn-link" data-target="why">
+      <span class="sn-num">01</span>
+      <span class="sn-text"><span class="sn-title">기획 동기</span><span class="sn-hint">왜 존재해야 하는가</span></span>
+      <span class="sn-dot"></span>
+    </a>
+    <a href="#svc" class="sn-link" data-target="svc">
+      <span class="sn-num">02</span>
+      <span class="sn-text"><span class="sn-title">서비스 구조</span><span class="sn-hint">작품 탐색 + 캐릭터 대화</span></span>
+      <span class="sn-dot"></span>
+    </a>
+    <a href="#revenue" class="sn-link" data-target="revenue">
+      <span class="sn-num">03</span>
+      <span class="sn-text"><span class="sn-title">수익 모델</span><span class="sn-hint">5가지 수익원 · Chip 설계</span></span>
+      <span class="sn-dot"></span>
+    </a>
+    <a href="#roadmap" class="sn-link" data-target="roadmap">
+      <span class="sn-num">04</span>
+      <span class="sn-text"><span class="sn-title">개발 로드맵</span><span class="sn-hint">5단계 · 17개월</span></span>
+      <span class="sn-dot"></span>
+    </a>
+    <a href="#finance" class="sn-link" data-target="finance">
+      <span class="sn-num">05</span>
+      <span class="sn-text"><span class="sn-title">재무 계획</span><span class="sn-hint">손익분기점 · 투자 유치</span></span>
+      <span class="sn-dot"></span>
+    </a>
+  </div>
+  <div class="sn-footer">
+    <a href="https://69f1ce9cf610cd15293ef08c--animated-snickerdoodle-c5807a.netlify.app/" target="_blank" style="display:block">
+      <button class="sn-cta">프로토타입 보기 →</button>
+    </a>
+  </div>
+</aside>
+
+<!-- PAGE BODY (shifts with sidebar) -->
+<div class="page-body">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-inner">
+      <div class="fu">
+        <div class="hero-badge"><span class="hero-badge-dot"></span> AI 콘텐츠 서비스 — 개발 로드맵 2026</div>
+        <div class="hero-logo">lor:e</div>
+        <div class="hero-tagline">취향 기반<br>작품 추천 & 캐릭터 대화 AI</div>
+        <p class="hero-sub">불법 사이트 수준의 세밀한 탐색을 합법으로. 작가가 승인한 캐릭터와 원작 설정 기반의 대화를. 하나의 생태계로.</p>
+        <div class="hero-pills">
+          <span class="pill pv"><span class="dot"></span>자연어 작품 탐색</span>
+          <span class="pill pc"><span class="dot"></span>원작 설정 캐릭터 대화</span>
+          <span class="pill pv"><span class="dot"></span>4단계 기억 구조</span>
+          <span class="pill pg"><span class="dot"></span>작가 승인 플로우</span>
+        </div>
+        <div class="hero-btns">
+          <a href="https://69f1ce9cf610cd15293ef08c--animated-snickerdoodle-c5807a.netlify.app/" target="_blank"><button class="btn-p">프로토타입 보기 →</button></a>
+          <a class="btn-s" href="#roadmap">개발 로드맵</a>
+        </div>
+      </div>
+      <div class="fu rd2">
+        <div class="hero-overview">
+          <div class="hero-ov-header">
+            <div class="hero-ov-title">서비스 개발 5단계 · 17개월 로드맵</div>
+            <div class="hero-ov-sub">초기 현금 지출 0원 → 정부 지원 → 투자 유치 10억</div>
+          </div>
+          <div class="ov-row">
+            <div class="ov-step-num">01</div>
+            <div class="ov-body">
+              <div class="ov-name">핵심 기능 설계 & 초기 개발</div>
+              <div class="ov-detail">현금 지출 0원 · 공동창업자 지분 구조</div>
+            </div>
+            <div class="ov-tag" style="background:var(--vd);color:var(--v);border:1px solid var(--vm)">4개월</div>
+          </div>
+          <div class="ov-row">
+            <div class="ov-step-num">02</div>
+            <div class="ov-body">
+              <div class="ov-name">작품 데이터 수집 & 확장</div>
+              <div class="ov-detail">Gemini 자동 수집 + 작가·이용자 직접 등록</div>
+            </div>
+            <div class="ov-tag" style="background:var(--cd);color:var(--c);border:1px solid var(--cm)">3개월</div>
+          </div>
+          <div class="ov-row">
+            <div class="ov-step-num">03</div>
+            <div class="ov-body">
+              <div class="ov-name">테스트 & 서비스 점검</div>
+              <div class="ov-detail">베타 테스터 100명 · 피드백 반영</div>
+            </div>
+            <div class="ov-tag" style="background:var(--gd);color:var(--g);border:1px solid var(--gm)">4개월</div>
+          </div>
+          <div class="ov-row dim">
+            <div class="ov-step-num">04</div>
+            <div class="ov-body">
+              <div class="ov-name">정식 출시 & 커뮤니티</div>
+              <div class="ov-detail">월 이용자 5,000명 목표 · 손익분기점 23,000명</div>
+            </div>
+            <div class="ov-tag" style="background:var(--ad);color:var(--a);border:1px solid var(--am)">6개월</div>
+          </div>
+          <div class="ov-row dim">
+            <div class="ov-step-num">05</div>
+            <div class="ov-body">
+              <div class="ov-name">제휴 · 투자 · 인수 시나리오</div>
+              <div class="ov-detail">카카오엔터 · 네이버웹툰 또는 독립 운영</div>
+            </div>
+            <div class="ov-tag" style="background:var(--rd);color:var(--r);border:1px solid var(--rm)">준비</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WHY -->
+<section id="why">
+  <div class="wrap">
+    <div class="eyebrow v reveal">기획 동기</div>
+    <div class="sec-title reveal rd1">이 서비스는<br><span class="hlv">왜 존재해야 하는가</span></div>
+    <p class="sec-desc reveal rd2">픽시브처럼 수천 가지 세밀한 태그로 작품을 검색할 수 있는 불법 사이트가 있다. 불법·무료임에도 그 검색 시스템만큼은 국내 어떤 합법 플랫폼보다 훨씬 정교하다. 그것을 합법의 영역으로 끌어오는 것이 이 서비스의 시작점이다.</p>
+    <div class="why-grid reveal rd3">
+      <div class="why-cell">
+        <div class="why-num">01</div>
+        <div class="why-title">기존 합법 플랫폼의 한계</div>
+        <div class="why-desc">웹소설·웹툰 플랫폼의 장르·태그 분류는 지나치게 단순하다. 취향이 구체적인 이용자일수록 원하는 작품을 찾지 못하고, 지금의 탐색 방식은 SNS 입소문이나 직접 발품에 의존하는 수준이다.</div>
+        <div class="why-quote">"리디의 해시태그가 현재 가장 세밀하지만, 그것도 플랫폼 안에서만 작동한다."</div>
+      </div>
+      <div class="why-cell">
+        <div class="why-num">02</div>
+        <div class="why-title">이미 검증된 수요</div>
+        <div class="why-desc">불법 무료 사이트에 이용자가 몰리는 건 단순히 무료여서만이 아니다. 그 시스템이 합법 플랫폼보다 훨씬 이용자 취향에 맞게 설계되어 있기 때문이다. 합법으로 그 이상을 제공한다면 이유 없이 불법에 남아있을 이유가 없다.</div>
+        <div class="why-quote">"이미 수요가 입증된 불법 시장을 양지화하면 그 이용자들은 자연스럽게 넘어온다."</div>
+      </div>
+      <div class="why-cell">
+        <div class="why-num">03</div>
+        <div class="why-title">첫 번째 핵심 질문</div>
+        <div class="why-desc">불법 무료 사이트도 이 정도인데, 왜 합법 양지 플랫폼에는 이런 시스템이 없는가. 이 수요는 분명히 실재하며 크다. 이 수요를 충족시켜주는 합법 플랫폼이 생긴다면 반드시 성장할 것이다.</div>
+        <div class="why-quote">"철저히 벤치마킹해 합법의 영역으로 끌어온다."</div>
+      </div>
+      <div class="why-cell">
+        <div class="why-num">04</div>
+        <div class="why-title">경쟁 우위 — 제타와의 차이</div>
+        <div class="why-desc">국내 AI 캐릭터 대화 최유사 서비스 제타(월 이용자 402만 명)는 원작 설정이 없고, 기억이 사라지며, BL 이용자에게 구조적 결함이 있다. 이 서비스는 세 가지 모두를 해결한다.</div>
+        <div class="why-quote">"원작 설정 자동 불러오기 + 4단계 영구 기억 + 관찰자 포지션 지원."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SERVICES -->
+<section id="svc">
+  <div class="wrap">
+    <div class="eyebrow v reveal">두 서비스 · 하나의 생태계</div>
+    <div class="sec-title reveal rd1">어느 쪽이 진입점이 되어도<br><span class="hlc">서로를 강화하는 구조</span></div>
+    <p class="sec-desc reveal rd2">특정 플랫폼에 종속되지 않고 세밀한 취향 조건으로 작품을 찾아주는 작품 탐색 AI와, 작가가 승인한 캐릭터와 원작 설정 기반으로 대화하는 캐릭터 대화 AI를 두 축으로 운영한다.</p>
+    <div class="svc-grid reveal rd3">
+      <div class="svc-card cv">
+        <div class="svc-header">
+          <div class="svc-icon v">🔍</div>
+          <div class="svc-name hlv">① 작품 탐색 AI</div>
+          <div class="svc-desc">감정·분위기·관계 구도·클리셰 등 복합 조건을 자연어로 입력. 사용자 정의 태그 생성 가능. 크로스 플랫폼 통합 탐색.</div>
+        </div>
+        <div class="svc-items">
+          <div class="svc-item">
+            <div class="svc-item-ic">✦</div>
+            <div class="svc-item-body">
+              <div class="svc-item-title">태그로 걸러낼 수 없는 조건</div>
+              <div class="svc-item-desc">"뱀파이어물인데 인간이 주인공이 아닌 것", "역하렘 로판인데 빙의·가상세계 설정이 없는 것"처럼 기존 분류 체계로는 표현 불가능한 복합 조건을 자연어로 검색.</div>
+            </div>
+          </div>
+          <div class="svc-item">
+            <div class="svc-item-ic">🔞</div>
+            <div class="svc-item-body">
+              <div class="svc-item-title">19세 콘텐츠 이용자에게 특히 강력한 차별점</div>
+              <div class="svc-item-desc">관계 구도·수위·특정 플레이 방식 등 기존 플랫폼이 절대 제공하지 못하는 세밀한 조건을 직접 입력해 탐색 가능. 이 수요는 실재하며 크다.</div>
+            </div>
+          </div>
+          <div class="svc-item">
+            <div class="svc-item-ic">🏷️</div>
+            <div class="svc-item-body">
+              <div class="svc-item-title">사용자 정의 태그</div>
+              <div class="svc-item-desc">플랫폼의 분류 언어로 표현되지 않는 취향도 이용자가 직접 태그를 만들어 검색 가능.</div>
+            </div>
+          </div>
+        </div>
+        <div class="svc-footer" style="color:var(--v)">→ 탐색 후 관심 작품의 캐릭터 대화로 자연 유입</div>
+      </div>
+      <div class="svc-card cc">
+        <div class="svc-header">
+          <div class="svc-icon c">💬</div>
+          <div class="svc-name hlc">② 캐릭터 대화 AI</div>
+          <div class="svc-desc">작가가 승인한 작품의 캐릭터와 원작 설정 기반 대화. 팬이 등록한 세부 설정이 쌓일수록 대화 정밀도 상승.</div>
+        </div>
+        <div class="svc-items">
+          <div class="svc-item">
+            <div class="svc-item-ic">⚡</div>
+            <div class="svc-item-body">
+              <div class="svc-item-title">원작 설정 기반 몰입감</div>
+              <div class="svc-item-desc">말투만 흉내 내는 일반 캐릭터 AI와 달리, 원작의 사건·관계·배경을 정확히 기억하는 대화가 가능하다.</div>
+            </div>
+          </div>
+          <div class="svc-item">
+            <div class="svc-item-ic">💖</div>
+            <div class="svc-item-body">
+              <div class="svc-item-title">덕질의 연장선</div>
+              <div class="svc-item-desc">작품을 다 보고 난 뒤 외전을 찾아 헤매거나 덕질할 방법을 찾아다니는 심리를 공략. 작품 탐색 → 캐릭터 대화 → 원작·유사작 탐색의 선순환.</div>
+            </div>
+          </div>
+          <div class="svc-item">
+            <div class="svc-item-ic">🌐</div>
+            <div class="svc-item-body">
+              <div class="svc-item-title">커뮤니티 기반 데이터 심화</div>
+              <div class="svc-item-desc">팬들이 나무위키 방식으로 세부 설정을 쌓을수록 캐릭터 대화 정밀도가 함께 올라가는 구조.</div>
+            </div>
+          </div>
+        </div>
+        <div class="svc-footer" style="color:var(--c)">→ 대화하다 원작이 궁금해지면 탐색 서비스로 자연 유입</div>
+      </div>
+    </div>
+
+    <!-- tech stack -->
+    <div class="tech-row reveal rd4">
+      <div class="tech-card">
+        <div class="tech-label">데이터 수집</div>
+        <div class="tech-val">Gemini 2.5 Flash-Lite</div>
+        <div class="tech-sub">플랫폼 텍스트 자동 수집 · 태그 생성<br><span style="color:var(--t3)">$0.10 / 백만 토큰</span></div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-label">추천 · 대화 엔진</div>
+        <div class="tech-val">Claude Haiku 4.5 + Sonnet 4.6</div>
+        <div class="tech-sub">Haiku 75% : Sonnet 25% 비율<br><span style="color:var(--t3)">Haiku $1.00 · Sonnet $3.00 / 백만 토큰</span></div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-label">데이터 저장소</div>
+        <div class="tech-val">AWS RDS PostgreSQL</div>
+        <div class="tech-sub">1년 무료 티어 사용<br><span style="color:var(--t3)">이후 월 19,000원</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- BENCHMARK -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow v reveal">경쟁 서비스 벤치마크</div>
+    <div class="sec-title reveal rd1">경쟁 서비스는 이미 있다.<br><span class="hlr">근데 다 부족하다.</span></div>
+    <p class="sec-desc reveal rd2">국내 AI 캐릭터 대화 서비스 중 가장 유사한 선행 서비스는 제타(Zeta)다. 수치는 공개 보도 기반이며, 결제 비율은 보수적 추정치다.</p>
+    <div class="bench-grid reveal rd3">
+      <div class="bench-stat">
+        <div class="bench-val hlv">402만 명</div>
+        <div class="bench-sub">월 이용자 수 (2026년 2월)</div>
+      </div>
+      <div class="bench-stat">
+        <div class="bench-val hlc" style="font-size:20px;font-weight:400;letter-spacing:0">사용시간 1위</div>
+        <div class="bench-sub">국내 AI 챗봇 기준 (2025년 11월)</div>
+      </div>
+      <div class="bench-stat">
+        <div class="bench-val hlg">약 10%</div>
+        <div class="bench-sub">결제 이용자 비율 (보수적 추정치)</div>
+      </div>
+    </div>
+    <div class="compare-grid reveal rd4">
+      <div class="compare-col">
+        <div class="compare-label" style="color:var(--r)">❌ 제타(Zeta)의 한계</div>
+        <div class="compare-items">
+          <div class="compare-item bad"><span class="ci-ic">✕</span>원작 설정 없음 — 이용자가 직접 번거롭게 입력</div>
+          <div class="compare-item bad"><span class="ci-ic">✕</span>대화가 길어지면 앞 내용 망각</div>
+          <div class="compare-item bad"><span class="ci-ic">✕</span>BL 이용자에게 구조적 결함 — 캐릭터가 이용자를 이성 파트너로 인식</div>
+          <div class="compare-item bad"><span class="ci-ic">✕</span>광고 시청으로 무료 이용 가능 → 결제 유인 낮음</div>
+          <div class="compare-item bad"><span class="ci-ic">✕</span>단일 모델 운영 — 비용 최적화 없음</div>
+        </div>
+      </div>
+      <div class="compare-col" style="background:var(--vd)">
+        <div class="compare-label" style="color:var(--v)">✦ lor:e의 해결책</div>
+        <div class="compare-items">
+          <div class="compare-item good"><span class="ci-ic">✓</span>원작 설정 자동 불러오기 — 처음부터 몰입 대화</div>
+          <div class="compare-item good"><span class="ci-ic">✓</span>4단계 영구 기억 구조</div>
+          <div class="compare-item good"><span class="ci-ic">✓</span>관찰자 포지션 지원 + 캐릭터 단체채팅</div>
+          <div class="compare-item good"><span class="ci-ic">✓</span>무료 체류 의도적 제한 → 3,300원 첫 결제 유도</div>
+          <div class="compare-item good"><span class="ci-ic">✓</span>Haiku 75% / Sonnet 25% 티어드 운영</div>
+        </div>
+      </div>
+    </div>
+    <div class="note-box reveal" style="margin-top:12px">출처: 연합뉴스 (2026.03) · ZDNet Korea (2026.03) · 유니콘팩토리 (2026.01) · 그린에드</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- REVENUE -->
+<section id="revenue">
+  <div class="wrap">
+    <div class="eyebrow v reveal">수익 모델</div>
+    <div class="sec-title reveal rd1">어디서 어떻게<br><span class="hlv">돈을 버는가</span></div>
+    <p class="sec-desc reveal rd2">플랫폼 제휴 수수료를 장기 핵심 수익으로 삼고, 광고·구독·Chip 충전으로 복합 수익을 확보한다. 5개 수익원이 서로를 보완하는 구조다.</p>
+    <div class="rev-layout reveal rd3">
+      <div class="rev-card dark-card">
+        <div class="rev-head dark-head">
+          <div class="rev-title hlv">초기 운영 수익</div>
+          <div class="rev-sub">광고 + Chip — 무료 이용자와 결제 이용자를 동시에 포착</div>
+        </div>
+        <div class="rev-items-list">
+          <div class="rev-item">
+            <div class="rev-item-title">② 서브컬처 동영상 광고 <span class="rev-price">무료 대상</span></div>
+            <div class="rev-item-desc">배너 대신 30초 동영상. 무료 사용 횟수 소진 후 "광고 1회 시청 → 추가 이용". 서브컬처 계열만 허용해 이용자 경험 최소 훼손. 1,000회 시청당 2,000~5,000원.</div>
+          </div>
+          <div class="rev-item">
+            <div class="rev-item-title">⑤ Chip 이용권 충전 <span class="rev-price">소액 반복</span></div>
+            <div class="rev-item-desc">서비스 내 가상 화폐. 작품찾기 15 Chip / 대화 25 Chip 소모. 잔액 부족 시 자동 충전. 자동 충전 활성화 시 5% 추가 적립 + 전용 프로필 테두리.</div>
+          </div>
+        </div>
+      </div>
+      <div class="rev-card">
+        <div class="rev-head">
+          <div class="rev-title hlc">구독 · 장기 수익</div>
+          <div class="rev-sub">잠금 효과와 플랫폼 파트너십으로 안정 수익</div>
+        </div>
+        <div class="rev-items-list">
+          <div class="rev-item ci">
+            <div class="rev-item-title">① 플랫폼 제휴 수수료 <span class="rev-price c">장기 핵심</span></div>
+            <div class="rev-item-desc">리디·레진·카카오페이지 등 개별 파트너십. 우리 서비스를 통해 유입된 이용자가 결제할 때 수수료 공유.</div>
+          </div>
+          <div class="rev-item ci">
+            <div class="rev-item-title">③ 프리미엄 구독 <span class="rev-price c">월 9,900원</span></div>
+            <div class="rev-item-desc">광고 완전 제거 + 매월 기본 Chip 2,000 포함 + 충전 시 상시 10% 추가 적립. 캐릭터 대화 기능 포함.</div>
+          </div>
+          <div class="rev-item gi">
+            <div class="rev-item-title">④ 대화 기억 저장 구독 <span class="rev-price g">월 3,300원</span></div>
+            <div class="rev-item-desc">캐릭터와의 대화 내용을 개인 서버에 저장. 기억 저장 없이는 매번 초기화. 대화를 안 하는 달에도 저장 공간 유지비로 고정 수익 발생.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CHIP TABLE -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow v reveal">Chip 이용권 패키지</div>
+    <div class="sec-title reveal rd1">마진 계산 근거 포함</div>
+    <p class="sec-desc reveal rd2">1 Chip = 1원 기준 설계. Claude API 처리 비용을 역산해 마진 30% 이상 확보. 구매 금액이 클수록 지급 Chip이 많아져 충성 이용자를 우대한다.</p>
+    <div class="chip-table reveal rd3">
+      <div class="chip-th">
+        <span>패키지</span><span>가격</span><span>지급 Chip</span><span>이용 횟수 기준</span><span>마진</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip-name">맛보기</span><span class="chip-price">3,300원</span><span class="chip-chips">3,500 Chip</span><span class="chip-usage">작품찾기 233회 / 대화 140회</span><span class="chip-margin">27%</span>
+      </div>
+      <div class="chip-row featured">
+        <span class="chip-name">실속 <span style="background:var(--v);color:#fff;font-size:10px;padding:2px 6px;border-radius:20px;font-weight:700">주력</span></span><span class="chip-price">9,900원</span><span class="chip-chips">11,000 Chip</span><span class="chip-usage">작품찾기 733회 / 대화 440회</span><span class="chip-margin">31%</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip-name">몰입</span><span class="chip-price">33,000원</span><span class="chip-chips">38,000 Chip</span><span class="chip-usage">작품찾기 2,533회 / 대화 1,520회</span><span class="chip-margin">34%</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip-name">매니아</span><span class="chip-price">99,000원</span><span class="chip-chips">120,000 Chip</span><span class="chip-usage">작품찾기 8,000회 / 대화 4,800회</span><span class="chip-margin">38%</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip-name">지배자</span><span class="chip-price">198,000원</span><span class="chip-chips">250,000 Chip</span><span class="chip-usage">작품찾기 16,667회 / 대화 10,000회</span><span class="chip-margin">41%</span>
+      </div>
+    </div>
+    <div class="hi-box hi-v reveal" style="margin-top:12px"><strong>마진 계산 근거</strong><br>작품 찾기 1회 원가 약 10원 — Claude API $3/백만 토큰 × 약 1,400토큰 × 1,400원 환율 → 캐싱 50% 절감 적용<br>캐릭터 대화 1회 가중평균 원가 약 9원 — Haiku 4.5(6원) × 75% + Sonnet 4.6(18원) × 25%</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MEMORY SYSTEM -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow v reveal">4단계 기억 구조</div>
+    <div class="sec-title reveal rd1">나를 기억하는 AI.<br><span class="hlv">우리가 나눈 대화를 영구히 소장.</span></div>
+    <p class="sec-desc reveal rd2">AI는 구조적으로 대화가 길어지면 앞 내용을 잊어버린다. ChatGPT나 Gemini에 직접 캐릭터를 세팅해도 초반만 괜찮고, 대화량이 쌓이면 설정을 잊는다. 이 서비스는 그 한계를 4단계 기억 구조로 해결한다. (기억 저장 구독 월 3,300원 이용자에게 제공)</p>
+    <div class="mem-layers reveal rd3">
+      <div class="mem-layer ml-v">
+        <span class="ml-badge" style="background:var(--vd);border:1px solid var(--vm);color:var(--v)">단기 기억</span>
+        <div>
+          <div class="ml-title">최근 10~20개 대화 원문 유지</div>
+          <div class="ml-desc">가장 최근 대화는 그대로 저장해 말투와 흐름을 자연스럽게 이어간다.</div>
+        </div>
+      </div>
+      <div class="mem-layer ml-c">
+        <span class="ml-badge" style="background:var(--cd);border:1px solid var(--cm);color:var(--c)">중기 기억</span>
+        <div>
+          <div class="ml-title">현재 상황·관계 변화 자동 요약</div>
+          <div class="ml-desc">대화가 길어지면 AI가 지금까지의 흐름을 자동 요약해 핵심만 간추려 기억한다.</div>
+        </div>
+      </div>
+      <div class="mem-layer ml-g">
+        <span class="ml-badge" style="background:var(--gd);border:1px solid var(--gm);color:var(--g)">장기 기억</span>
+        <div>
+          <div class="ml-title">전체 대화 개인 서버 저장 + 실시간 검색</div>
+          <div class="ml-desc">수만 줄의 과거 대화와 작품 설정을 개인 서버에 보관. 현재 대화와 관련된 내용을 실시간으로 꺼내 답변에 반영한다.</div>
+        </div>
+      </div>
+      <div class="mem-layer ml-a">
+        <span class="ml-badge" style="background:var(--ad);border:1px solid var(--am);color:var(--a)">고정 기억</span>
+        <div>
+          <div class="ml-title">이용자가 직접 핀 고정 — 절대 잊지 않는다</div>
+          <div class="ml-desc">이름·성별·절대 잊으면 안 되는 핵심 설정은 이용자가 직접 고정. 어떤 상황에서도 AI가 항상 인식한다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUP CHAT -->
+    <div style="margin-top:32px">
+      <div class="eyebrow a reveal" style="margin-bottom:8px">추가 기능 — 이미 가능한 기술</div>
+      <div class="card reveal rd2" style="border-color:var(--am);background:var(--ad)">
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px">🗨️ 캐릭터 단체채팅 — 내 최애들이 서로 대화한다면?</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.8;margin-bottom:14px">머슴닷컴은 AI만 글과 댓글을 작성할 수 있는 커뮤니티로, AI들이 서로 상호작용하며 게시물을 올리고 댓글을 단다. <strong style="color:var(--t1)">AI끼리 실시간으로 상호작용하는 것이 기술적으로 충분히 가능하다는 증거다.</strong> 이를 lor:e에 적용하면 각자의 성격과 원작 설정으로 구현된 캐릭터 AI들이 단체 채팅방 안에서 실시간으로 대화한다.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="tech-card" style="background:var(--bg2)">
+            <div class="tech-label" style="color:var(--a)">BL · 여성향 이용자</div>
+            <div class="tech-val" style="font-size:13px">관찰자 포지션으로 순수하게 즐길 수 있는 구조. 이용자가 개입하지 않아도 캐릭터끼리 자연스럽게 상호작용.</div>
+          </div>
+          <div class="tech-card" style="background:var(--bg2)">
+            <div class="tech-label" style="color:var(--a)">크로스오버 콘텐츠</div>
+            <div class="tech-val" style="font-size:13px">다른 세계관 캐릭터끼리의 만남. 기존엔 팬픽으로만 가능했던 것이 실시간 AI 시뮬레이션으로.</div>
+          </div>
+        </div>
+        <div class="note-box" style="margin-top:10px">※ 기술 구현 난이도가 높아 초기 핵심 기능은 아님. 서비스 안정화 이후 단계적으로 추가 개발 예정.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COPYRIGHT -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow v reveal">저작권 해결</div>
+    <div class="sec-title reveal rd1">저작권은<br><span class="hlg">어떻게 해결하는가</span></div>
+    <p class="sec-desc reveal rd2">공식 캐릭터 탭과 자유 창작 캐릭터 탭을 명확히 분리해 플랫폼 리스크를 최소화하고, 작가에게는 수익 인센티브로 자발적 참여를 유도한다.</p>
+    <div class="copy-cols reveal rd3">
+      <div class="copy-col">
+        <div class="copy-col-head">
+          <div class="copy-status" style="background:var(--gd);border:1px solid var(--gm);color:var(--g)">✓ 저작권 리스크 없음</div>
+          <div class="copy-col-title">공식 캐릭터 탭</div>
+          <div class="copy-col-sub">작가가 직접 승인한 작품의 캐릭터. 원작 설정 준수. 수익 일부를 작가 인센티브로 배분. 검인 마크 표시.</div>
+        </div>
+        <div class="copy-body">
+          <div class="note-box" style="margin-bottom:12px"><strong>작가 인센티브 — 대화 비중 기반 수익 배분</strong><br>프리미엄 구독료(9,900원) 중 작가 배분 풀 30% = 2,970원. 해당 달 전체 대화 중 특정 작가 캐릭터 대화 비중에 따라 배분. 예) 비중 40% → 해당 작가 월 수익 1,188원/구독자.</div>
+          <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:8px">등록 플로우</div>
+          <div class="copy-step-flow">
+            <div class="copy-step">
+              <div class="copy-step-num">1</div>
+              <div class="copy-step-text">팬 또는 작가가 작품 등록 → 작품 정보·캐릭터 설정 입력 (미승인 상태에서는 캐릭터 대화 기능 잠금)</div>
+            </div>
+            <div class="copy-step">
+              <div class="copy-step-num">2</div>
+              <div class="copy-step-text">플랫폼이 작가에게 자동 연락 → "당신 작품이 등록됐고, 승인 시 수익이 발생합니다"</div>
+            </div>
+            <div class="copy-step">
+              <div class="copy-step-num">3</div>
+              <div class="copy-step-text">작가 승인 후 캐릭터 대화 기능 활성화 → 대화 비중 기반 수익 배분 시작</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="copy-col">
+        <div class="copy-col-head">
+          <div class="copy-status" style="background:var(--cd);border:1px solid var(--cm);color:var(--c)">⚙ 성인·민감 필터 적용</div>
+          <div class="copy-col-title">자유 창작 캐릭터 탭</div>
+          <div class="copy-col-sub">이용자가 직접 만든 오리지널 캐릭터. 자캐, 2차 창작 등 포함. 생성한 이용자 본인에게 책임 귀속 (이용 약관 명시).</div>
+        </div>
+        <div class="copy-body">
+          <div class="note-box" style="margin-bottom:12px">자유 창작 탭에는 별도 성인·민감 콘텐츠 필터를 적용해 플랫폼 책임 범위를 명확히 한다.</div>
+          <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:8px">초기 캐릭터 풀 확보 전략</div>
+          <div class="note-box" style="margin-bottom:8px">기성 IP 없이 시작하는 대신, 요즘 화제성 있는 작품 몇 개와 공격적으로 계약을 따낸다. 그 실적을 보여주면 "내 작품도 홍보되겠다"는 생각으로 다른 작가들이 자발적으로 참여하게 된다.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="copy-step" style="flex-direction:column;gap:4px">
+              <div style="font-size:10px;font-weight:700;color:var(--v)">국내</div>
+              <div class="copy-step-text">브릿G·조아라 연재 작가, 트위터/X 활동 창작자에게 직접 DM·커뮤니티 공지로 접근.</div>
+            </div>
+            <div class="copy-step" style="flex-direction:column;gap:4px">
+              <div style="font-size:10px;font-weight:700;color:var(--c)">해외</div>
+              <div class="copy-step-text">픽시브 한국어 창작자, 왓패드 한국 작가 등. 팬 선등록 → 자동 연락 플로우로 자연 유입.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROTOTYPE CTA -->
+<div class="wrap">
+  <div class="proto-cta-wrap reveal">
+    <div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:4px">UI 프로토타입</div>
+      <div class="proto-cta-desc">메인 검색 · 취향 탐색 · 작품 등록 · 구독 플랜 화면을 직접 확인할 수 있습니다</div>
+    </div>
+    <a href="https://69f1ce9cf610cd15293ef08c--animated-snickerdoodle-c5807a.netlify.app/" target="_blank"><button class="btn-p">프로토타입 보러가기 →</button></a>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="eyebrow v reveal">개발 로드맵</div>
+    <div class="sec-title reveal rd1">5단계 · <span class="hlv">17개월</span></div>
+    <p class="sec-desc reveal rd2">공동창업자 지분 구조로 초기 현금 지출 0원에서 시작. 정부 지원 활용 → 베타 테스트 → 정식 출시 → 투자 유치로 이어지는 단계별 전략.</p>
+
+    <div class="phase-progress reveal">
+      <div class="progress-seg" style="flex:4;background:var(--v)"></div>
+      <div class="progress-seg" style="flex:3;background:var(--c)"></div>
+      <div class="progress-seg" style="flex:4;background:var(--g)"></div>
+      <div class="progress-seg" style="flex:6;background:var(--a)"></div>
+      <div class="progress-seg" style="flex:6;background:var(--r)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:6px;margin-bottom:32px">
+      <span style="color:var(--v)">01 핵심 개발 4M</span>
+      <span style="color:var(--c)">02 데이터 수집 3M</span>
+      <span style="color:var(--g)">03 테스트 4M</span>
+      <span style="color:var(--a)">04 정식 출시 6M</span>
+      <span style="color:var(--r)">05 제휴·투자</span>
+    </div>
+
+    <div class="phases reveal rd2">
+
+      <!-- PHASE 01 -->
+      <div class="phase">
+        <div class="phase-left">
+          <div class="phase-num-big">01</div>
+          <div class="phase-name">핵심 기능 설계 및<br>초기 버전 개발</div>
+          <div class="phase-dur-pill" style="background:var(--vd);border-color:var(--vm);color:var(--v)">4개월 (+ 최대 2개월)</div>
+        </div>
+        <div class="phase-right">
+          <div class="phase-reason">
+            <div class="phase-reason-title">4개월 근거</div>
+            <div class="phase-reason-body">1개월: 취향 분석 로직 + AWS RDS 데이터베이스 구조 + 기억 저장 서버 설계<br>1개월: Claude API 연결 및 검색 화면·캐릭터 대화 화면·Chip 결제 시스템 개발<br>1개월: 이용자 정보 입력 시스템 + 작가 승인 플로우 + 트리거 워닝 + 자동 충전 시스템 개발<br>1개월: 내부 테스트 및 오류 수정</div>
+          </div>
+          <div class="recruit-box">
+            <div class="recruit-title">Recruiting — CTO 공동창업자 모집</div>
+            <div class="recruit-body">명지대 용인캠퍼스 재학생 또는 서울·수도권 공과대학 개발자 지망 학생. 최소 요구: Claude API 연결 + AWS RDS 세팅 + 결제 시스템 구현 + 기본 보안 설정. 지분 구조: 대표 75% 이상 / CTO 15~25% (4년 베스팅 · 1년 클리프). 주주간계약서 체결 필수.</div>
+          </div>
+          <div class="phase-cards">
+            <div class="phase-card">
+              <div class="phase-card-label">개발 인력</div>
+              <div class="phase-card-val hlv" style="font-size:15px">CTO 공동창업자 1명</div>
+              <div class="phase-card-sub">월급 대신 지분(15~25%)으로 보상. 초기 현금 인건비 0원.</div>
+            </div>
+            <div class="phase-card">
+              <div class="phase-card-label">데이터베이스 (AWS RDS)</div>
+              <div class="phase-card-val hlg" style="font-size:15px">1년 무료</div>
+              <div class="phase-card-sub">신규 계정 12개월 무료. db.t3.micro + 20GB. 1년 후 월 19,000원.</div>
+            </div>
+          </div>
+          <div class="phase-note" style="background:var(--vd);border-color:var(--v);color:var(--v)">
+            <strong>1단계 총 비용: 현금 지출 0원</strong><br>개발 인력 → 지분 보상(공동창업자 구조)으로 대체. 서버 무료. 사무실 없음(원격근무).<br>예비창업패키지 평균 5,000만원 무상지원 가능 — 지원금 전액을 2단계 이후에 활용 가능. 여성창업경진대회(수상 시 최대 2,000만원) 병행 가능.
+          </div>
+          <div class="phase-tags">
+            <span class="pill pv"><span class="dot"></span>웹소설 여성향 로판 (전연령~19세)</span>
+            <span class="pill pv"><span class="dot"></span>웹소설 BL (전연령~19세)</span>
+            <span class="pill pv"><span class="dot"></span>일본 만화·애니 (전연령~19세)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 02 -->
+      <div class="phase">
+        <div class="phase-left">
+          <div class="phase-num-big" style="background:linear-gradient(135deg,var(--c),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">02</div>
+          <div class="phase-name">작품 데이터 수집<br>및 확장</div>
+          <div class="phase-dur-pill" style="background:var(--cd);border-color:var(--cm);color:var(--c)">3개월</div>
+        </div>
+        <div class="phase-right">
+          <div class="phase-reason">
+            <div class="phase-reason-title">데이터 수집 3단계 구조</div>
+            <div class="phase-reason-body"><strong>1단계</strong> — Gemini 2.5 Flash-Lite 자동 수집: 하루 최대 2,500개 처리. 나무위키·카카오페이지·조아라·네이버 시리즈·리디 + 일본 만화·애니.<br><strong>2단계</strong> — 작가 + 이용자 직접 등록: 마이너 작품·신작. 등록 시 Chip 지급.<br><strong>3단계</strong> — 이용자 세부 정보 기여: 등장인물 특징·관계 구도·과거사 등 나무위키 방식. 기여 시 Chip 지급.</div>
+          </div>
+          <div class="phase-cards">
+            <div class="phase-card">
+              <div class="phase-card-label">AI + 사람 합동 검수</div>
+              <div class="phase-card-val hlc" style="font-size:14px">전체의 10~20%만 사람이 검토</div>
+              <div class="phase-card-sub">Gemini 0~100점 채점 → 기준 점수 이상 건만 최종 확인. 인건비 절감.</div>
+            </div>
+            <div class="phase-card">
+              <div class="phase-card-label">검토 인력 비용</div>
+              <div class="phase-card-val hlc" style="font-size:15px">월 180만원</div>
+              <div class="phase-card-sub">2명 × 건당 3,000원 × 하루 30건 × 30일</div>
+            </div>
+          </div>
+          <div class="tl-tags">
+            <div class="tl-tag-row"><span class="tl-period" style="background:var(--vd);color:var(--v);border:1px solid var(--vm)">1~4개월</span><span class="tl-tag-desc">웹소설 로판·BL + 일본 만화·애니 동시 시작.</span></div>
+            <div class="tl-tag-row"><span class="tl-period" style="background:var(--cd);color:var(--c);border:1px solid var(--cm)">5~7개월</span><span class="tl-tag-desc">웹소설 여성향 전 장르 확장.</span></div>
+            <div class="tl-tag-row"><span class="tl-period" style="background:var(--gd);color:var(--g);border:1px solid var(--gm)">8~12개월</span><span class="tl-tag-desc">웹툰 분야 추가.</span></div>
+            <div class="tl-tag-row"><span class="tl-period" style="background:var(--ad);color:var(--a);border:1px solid var(--am)">13개월~</span><span class="tl-tag-desc">문피아 등 남성향 웹소설·한국 웹툰 전 장르 추가.</span></div>
+          </div>
+          <div class="phase-note" style="background:var(--cd);border-color:var(--c);color:var(--c)">3개월 내 목표: Gemini 자동 수집 수만 개 + 직접 등록 500개 이상 + 작가 승인 캐릭터 50개 이상 확보.</div>
+        </div>
+      </div>
+
+      <!-- PHASE 03 -->
+      <div class="phase">
+        <div class="phase-left">
+          <div class="phase-num-big" style="background:linear-gradient(135deg,var(--g),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">03</div>
+          <div class="phase-name">테스트 및<br>서비스 점검</div>
+          <div class="phase-dur-pill" style="background:var(--gd);border-color:var(--gm);color:var(--g)">4개월 (+ 최대 2개월)</div>
+        </div>
+        <div class="phase-right">
+          <div class="phase-reason">
+            <div class="phase-reason-title">4개월 근거</div>
+            <div class="phase-reason-body">① 내부 기능 점검 2주 &nbsp; ② 소규모 베타 서비스 4주 &nbsp; ③ 추천 정확도·대화 몰입도·Chip 결제 흐름 분석 4주<br>④ 편의성 개선 및 재점검 2주 &nbsp; ⑤ 정식 출시 준비 2주</div>
+          </div>
+          <div class="phase-cards">
+            <div class="phase-card">
+              <div class="phase-card-label">트리거 워닝</div>
+              <div class="phase-card-val" style="font-size:14px;color:var(--a)">자살·범죄·잔혹 묘사</div>
+              <div class="phase-card-sub">검색 결과에서 경고 문구 표시 + 이미지 흐릿하게 처리.</div>
+            </div>
+            <div class="phase-card">
+              <div class="phase-card-label">민감 키워드 공익 안내</div>
+              <div class="phase-card-val" style="font-size:14px;color:var(--g)">자살예방 상담전화 (109)</div>
+              <div class="phase-card-sub">자살·자해 키워드 검색 시 자동 안내 표시.</div>
+            </div>
+          </div>
+          <div class="note-box" style="margin-bottom:12px"><strong>베타 테스터 100명 보상 정책</strong><br>전원 기본 보상(100명): 피드백 강요 없이 자유 이용. 정식 출시 후 선물 선택지 1개 (라프텔·넷플릭스 1개월권 / 카카오페이지·리디·레진·봄툰 캐시 1만원). 총 100만원. 상세 피드백 작성자(약 30명): 프리미엄 구독권 1년 추가 제공. 총 약 320만원.</div>
+          <div class="phase-note" style="background:var(--gd);border-color:var(--g);color:var(--g)">1~3단계 누적: 7개월 (정상) / 최대 11개월 (문제 발생 시)</div>
+        </div>
+      </div>
+
+      <!-- PHASE 04 -->
+      <div class="phase" id="finance">
+        <div class="phase-left">
+          <div class="phase-num-big" style="background:linear-gradient(135deg,var(--a),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">04</div>
+          <div class="phase-name">정식 출시 및<br>이용자 커뮤니티 형성</div>
+          <div class="phase-dur-pill" style="background:var(--ad);border-color:var(--am);color:var(--a)">6개월</div>
+        </div>
+        <div class="phase-right">
+          <div class="phase-reason">
+            <div class="phase-reason-title">6개월 근거 — 월 이용자 5,000명 기준 · 결제 이용자 10% 가정</div>
+            <div class="phase-reason-body">취향 특화 소규모 서비스에서 월 이용자 5,000명 달성까지 통상 3~6개월 소요. 초기 3개월 광고 집중, 이후 3개월 유료 전환율 측정 및 수익 구조 안정화.</div>
+          </div>
+
+          <div class="finance-block">
+            <div class="finance-section-head">💰 월 수익</div>
+            <div class="fin-row"><span class="fin-label">동영상 광고 수익</span><div class="fin-right"><div class="fin-val">12만원</div><div class="fin-detail">무료 이용자 중 일 활성 30% × 광고 1회 × 30일 = 40,500회. 1,000회당 3,000원</div></div></div>
+            <div class="fin-row"><span class="fin-label">프리미엄 구독료</span><div class="fin-right"><div class="fin-val">198만원</div><div class="fin-detail">결제 이용자 500명 중 40% (200명) × 9,900원</div></div></div>
+            <div class="fin-row"><span class="fin-label">기억 저장 구독료</span><div class="fin-right"><div class="fin-val">50만원</div><div class="fin-detail">결제 이용자 500명 중 30% (150명) × 3,300원</div></div></div>
+            <div class="fin-row"><span class="fin-label">Chip 충전 수익</span><div class="fin-right"><div class="fin-val">600만원</div><div class="fin-detail">결제 이용자 중 60% (300명) × 평균 20,000원</div></div></div>
+            <div class="fin-row"><span class="fin-label">작가 광고 노출권</span><div class="fin-right"><div class="fin-val">50만원</div><div class="fin-detail">초기 보수적 추산. 작가 5명 × 10만원</div></div></div>
+            <div class="fin-row total-g"><span class="fin-label" style="font-weight:700">월 총 수익</span><div class="fin-right"><div class="fin-val hlg" style="font-size:18px">910만원</div></div></div>
+          </div>
+
+          <div class="finance-block">
+            <div class="finance-section-head">💸 월 지출</div>
+            <div class="fin-row"><span class="fin-label">AI 비용 — 작품 찾기</span><div class="fin-right"><div class="fin-val">450만원</div><div class="fin-detail">5,000명 × 하루 평균 3회 × 30일 × 10원</div></div></div>
+            <div class="fin-row"><span class="fin-label">AI 비용 — 캐릭터 대화</span><div class="fin-right"><div class="fin-val">607만원</div><div class="fin-detail">프리미엄 이용자 1,500명 × 하루 15회 × 30일 × 가중평균 9원</div></div></div>
+            <div class="fin-row"><span class="fin-label">대화 기억 저장 서버</span><div class="fin-right"><div class="fin-val">100만원</div><div class="fin-detail">구독자 1,500명 × 667원. 벡터 DB 업계 평균 단가 기준</div></div></div>
+            <div class="fin-row"><span class="fin-label">인건비 (경력 3년 × 4명)</span><div class="fin-right"><div class="fin-val">2,000만원</div><div class="fin-detail">500만원 × 4명</div></div></div>
+            <div class="fin-row"><span class="fin-label">작품 검토 인력</span><div class="fin-right"><div class="fin-val">180만원</div><div class="fin-detail">2명 × 건당 3,000원 × 하루 30건 × 30일</div></div></div>
+            <div class="fin-row"><span class="fin-label">마케팅</span><div class="fin-right"><div class="fin-val">250만원</div><div class="fin-detail">인스타 릴스 50만원 + 유튜브 채널 광고 200만원</div></div></div>
+            <div class="fin-row"><span class="fin-label">Gemini 수집 + AWS</span><div class="fin-right"><div class="fin-val">7만원</div><div class="fin-detail">AWS 1년 무료 티어 종료 후 적용</div></div></div>
+            <div class="fin-row total-r"><span class="fin-label" style="font-weight:700">월 총 지출</span><div class="fin-right"><div class="fin-val hlr" style="font-size:18px">3,594만원</div></div></div>
+          </div>
+
+          <div class="result-cards">
+            <div class="result-card red">
+              <div class="result-label">월 적자 (초기 구간)</div>
+              <div class="result-val hlr">−2,684만원</div>
+            </div>
+            <div class="result-card grn">
+              <div class="result-label">손익분기점 (결제율 10% 유지 시)</div>
+              <div class="result-val hlg">약 23,000명</div>
+            </div>
+          </div>
+          <div class="phase-note" style="background:var(--gd);border-color:var(--g);color:var(--g);margin-top:12px">청년창업 세액감면 — 만 34세 이하 창업 시 소득 발생 연도부터 5년간 소득세·법인세 50% 이상 감면</div>
+        </div>
+      </div>
+
+      <!-- PHASE 05 -->
+      <div class="phase" style="border-bottom:none">
+        <div class="phase-left">
+          <div class="phase-num-big" style="background:linear-gradient(135deg,var(--r),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">05</div>
+          <div class="phase-name">대기업 제휴 · 투자 유치 · 인수 시나리오</div>
+          <div class="phase-dur-pill" style="background:var(--rd);border-color:var(--rm);color:var(--r)">정식 출시 6개월 후</div>
+        </div>
+        <div class="phase-right">
+          <div class="phase-cards">
+            <div class="phase-card" style="border-color:var(--gm);background:var(--gd)">
+              <div class="phase-card-label">계속 운영</div>
+              <div class="phase-card-val hlg" style="font-size:14px">독립 수익 안정화</div>
+              <div class="phase-card-sub">투자금 10억 ÷ 월 적자 2,684만원 = 약 37개월 운영 가능. 이용자가 23,000명을 넘는 시점부터 투자금 보존. 이후 독립 운영으로 수익 안정화 후 더 높은 가격에 협상.</div>
+            </div>
+            <div class="phase-card" style="border-color:var(--am);background:var(--ad)">
+              <div class="phase-card-label">대기업에 매각</div>
+              <div class="phase-card-val hla" style="font-size:14px">카카오엔터 · 네이버웹툰</div>
+              <div class="phase-card-sub">이용자 수·작품 데이터·기억 데이터·기술력이 핵심 협상 자산. 제안 시점: 월 이용자 5,000명·데이터 3,000개·6개월 실적 확보 후.</div>
+            </div>
+          </div>
+          <div class="phase-cards">
+            <div class="phase-card">
+              <div class="phase-card-label">목표 투자 유치</div>
+              <div class="phase-card-val hlv">10억원</div>
+            </div>
+            <div class="phase-card">
+              <div class="phase-card-label">초기 적자 기준 운영 가능 기간</div>
+              <div class="phase-card-val hlv">약 37개월</div>
+            </div>
+          </div>
+          <div class="phase-note" style="background:var(--rd);border-color:var(--r);color:var(--r)">대기업 제안서는 이 시점에 작성 — 현 단계는 기획 및 로드맵 완성에 집중</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- LOYALTY -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow v reveal">이용자 충성도</div>
+    <div class="sec-title reveal rd1">한번 빠지면<br><span class="hlv">못 나오는 구조</span></div>
+    <p class="sec-desc reveal rd2">나무위키 사서들은 돈도 안 받고 왜 그 많은 글을 쓰는가? 자기 지식을 뽐내고 싶은 심리, 내가 기여해 만들어가고 있다는 소속감이 동기다. 서브컬처 덕후들의 특성 — 잘난 척, 오지랖, 설명충 — 을 정확히 자극하면 돈도 안 받고 서비스를 키워주는 사람들이 생긴다.</p>
+    <div class="loyalty-grid reveal rd3">
+      <div class="loyalty-card">
+        <div class="loyalty-icon">🔓</div>
+        <div class="loyalty-title">캐릭터 친밀도 + 시크릿 에피소드 해금</div>
+        <div class="loyalty-desc">특정 캐릭터와 일정량 이상 대화하면 친밀도 레벨 상승. 레벨 달성 시 비공개 설정 문서나 특수 텍스트 시나리오(if 스토리) 열람 권한 부여. "조금만 더 하면 열리는데" 심리를 이용한다.</div>
+      </div>
+      <div class="loyalty-card">
+        <div class="loyalty-icon">👑</div>
+        <div class="loyalty-title">VIP 등급 명예 보상</div>
+        <div class="loyalty-desc">월 누적 결제액에 따라 한정판 칭호·채팅 테두리·특수 이모티콘 제공. 헤비 결제 이용자에게 커뮤니티 안에서의 시각적 차별화를 준다. 덕후들의 과시 욕구를 자극해 고액 패키지 구매로 이어지게 한다.</div>
+      </div>
+      <div class="loyalty-card">
+        <div class="loyalty-icon">⚡</div>
+        <div class="loyalty-title">자동 충전 — 결제하는 줄도 모르게</div>
+        <div class="loyalty-desc">Chip 잔액이 일정 수준 이하 시 설정한 패키지 자동 결제. 스타벅스 자동 충전과 같은 구조 — 대화 흐름이 끊기지 않아 몰입이 유지되고, 월말 카드 고지서에서 처음으로 인식된다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SUMMARY -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow v reveal">전체 요약</div>
+    <div class="sec-title reveal rd1">2026년 3월 공식 단가 기준</div>
+    <div class="summary-grid reveal rd2">
+      <div class="sum-cell">
+        <div class="sum-label">총 개발 기간</div>
+        <div class="sum-val hlv">17개월</div>
+        <div class="sum-sub">최대 21개월 (1단계 4M + 2단계 3M + 3단계 4M + 4단계 6M + 5단계 준비 3M 포함)</div>
+      </div>
+      <div class="sum-cell">
+        <div class="sum-label">정식 출시까지 총 비용</div>
+        <div class="sum-val hlv" style="font-size:clamp(18px,2vw,26px)">1억 9,340만원</div>
+        <div class="sum-sub">1단계 현금 지출 0원(공동창업자 지분 구조) + 3단계 4,940만원 + 4단계 1억 4,952만원</div>
+      </div>
+      <div class="sum-cell">
+        <div class="sum-label">정부 지원 활용 시 실부담</div>
+        <div class="sum-val hlc" style="font-size:clamp(18px,2vw,26px)">약 1억 1,000만원</div>
+        <div class="sum-sub">예비창업패키지 5,000만원 + 초기창업패키지 1억원 무상지원 활용 시. 여성 특화 지원 병행 시 추가 절감 가능.</div>
+      </div>
+      <div class="sum-cell">
+        <div class="sum-label">투자 유치 목표 / 손익분기점</div>
+        <div class="sum-val hlg" style="font-size:clamp(18px,2vw,26px)">10억 / 23,000명</div>
+        <div class="sum-sub">결제 이용자 10% 가정. 티어드 모델 운영 기준 초기 적자 약 2,684만원 → 약 37개월 운영 가능.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">lor:e</div>
+  <div class="footer-info">AI 콘텐츠 디자인 과제 · 2026년 3월 기준 실데이터</div>
+  <div class="footer-info">취향 기반 작품 추천 &amp; 캐릭터 대화 AI 서비스 개발 로드맵</div>
+</footer>
+
+</div><!-- /page-body -->
+
+<script>
+// Scroll reveal
+if('IntersectionObserver' in window){
+  const revObs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})
+  },{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+}else{
+  document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
+}
+
+// Sidebar toggle
+const toggleBtn = document.getElementById('sn-toggle');
+if(toggleBtn){
+  toggleBtn.addEventListener('click', ()=>{
+    document.body.classList.toggle('sn-closed');
+  });
+}
+
+function scrollToRoadmapTarget(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const nav=document.querySelector('.sidenav');
+  const navH=nav?nav.getBoundingClientRect().height:0;
+  const y=el.getBoundingClientRect().top+window.scrollY-navH-12;
+  window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+}
+
+// Sidenav TOC uses native hash links on mobile for maximum browser compatibility.
+
+// Reading progress bar
+function updateProgress(){
+  const scrollTop=window.scrollY;
+  const docH=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=docH>0?Math.round((scrollTop/docH)*100):0;
+  const fill=document.getElementById('sn-fill');
+  const pctEl=document.getElementById('sn-pct');
+  if(fill)fill.style.width=pct+'%';
+  if(pctEl)pctEl.textContent=pct+'%';
+}
+window.addEventListener('scroll',updateProgress,{passive:true});
+updateProgress();
+
+// Scroll spy
+const sections=['why','svc','revenue','roadmap','finance'];
+if('IntersectionObserver' in window){
+  const spyObs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        document.querySelectorAll('.sn-link').forEach(b=>b.classList.remove('active'));
+        const match=document.querySelector(`.sn-link[data-target="${e.target.id}"]`);
+        if(match)match.classList.add('active');
+      }
+    });
+  },{threshold:0.25,rootMargin:'-5% 0px -65% 0px'});
+  sections.forEach(id=>{const el=document.getElementById(id);if(el)spyObs.observe(el);});
+}
+</script>
+</body>
+</html>
