@@ -4142,7 +4142,79 @@ function mobileWorkReasons(work,limit=3){
 function mobileReasonChips(tags=[],className=''){
   return tags.map(tag=>`<span${className?` class="${className}"`:''}>#${escapeHtml(tag)}</span>`).join('');
 }
-function mobileSetMainMode(intent='search'){
+const MOBILE_MAIN_PLACEHOLDERS={
+  search:[
+    '집착남주 로판인데 빙의 설정 없는 거',
+    '어둡고 관계성 진한 다크판타지',
+    '완결 난 BL 중에 감정선 깊은 작품',
+    '세계관이 크고 여운 남는 애니'
+  ],
+  char:[
+    '분노조절장애 백금발 미녀 캐릭터',
+    '나를 기억하는 차분한 집사 캐릭터',
+    '말투가 다정하지만 위험한 최애',
+    '혐관으로 시작하는 도도한 캐릭터'
+  ]
+};
+let mobilePlaceholderTimer=null;
+let mobilePlaceholderMode='search';
+let mobilePlaceholderIndex=0;
+let mobilePlaceholderChar=0;
+let mobilePlaceholderDeleting=false;
+function mobileMainExampleText(mode='search'){
+  const list=MOBILE_MAIN_PLACEHOLDERS[mode]||MOBILE_MAIN_PLACEHOLDERS.search;
+  return list[mobilePlaceholderIndex%list.length];
+}
+function isMobileMainExampleText(text=''){
+  const value=String(text).trim();
+  return Object.values(MOBILE_MAIN_PLACEHOLDERS).flat().includes(value);
+}
+function queueMobileMainPlaceholder(delay=70){
+  if(mobilePlaceholderTimer) window.clearTimeout(mobilePlaceholderTimer);
+  mobilePlaceholderTimer=window.setTimeout(runMobileMainPlaceholder,delay);
+}
+function runMobileMainPlaceholder(){
+  const input=document.getElementById('m-main-query');
+  if(!input||!document.body.classList.contains('mobile-main')) return;
+  if(input.value.trim()){
+    queueMobileMainPlaceholder(420);
+    return;
+  }
+  const list=MOBILE_MAIN_PLACEHOLDERS[mobilePlaceholderMode]||MOBILE_MAIN_PLACEHOLDERS.search;
+  const phrase=list[mobilePlaceholderIndex%list.length];
+  if(!mobilePlaceholderDeleting){
+    mobilePlaceholderChar++;
+    input.placeholder=phrase.slice(0,mobilePlaceholderChar)+'|';
+    if(mobilePlaceholderChar>=phrase.length){
+      input.placeholder=phrase;
+      mobilePlaceholderDeleting=true;
+      queueMobileMainPlaceholder(1350);
+      return;
+    }
+    queueMobileMainPlaceholder(54);
+    return;
+  }
+  mobilePlaceholderChar--;
+  input.placeholder=phrase.slice(0,Math.max(0,mobilePlaceholderChar))+'|';
+  if(mobilePlaceholderChar<=0){
+    mobilePlaceholderDeleting=false;
+    mobilePlaceholderIndex=(mobilePlaceholderIndex+1)%list.length;
+    queueMobileMainPlaceholder(360);
+    return;
+  }
+  queueMobileMainPlaceholder(24);
+}
+function startMobileMainPlaceholder(mode='search',restart=false){
+  const normalized=mode==='char'?'char':'search';
+  if(restart||mobilePlaceholderMode!==normalized){
+    mobilePlaceholderMode=normalized;
+    mobilePlaceholderIndex=0;
+    mobilePlaceholderChar=0;
+    mobilePlaceholderDeleting=false;
+  }
+  queueMobileMainPlaceholder(restart?120:40);
+}
+function mobileSetMainMode(intent='search',options={}){
   const mode=intent==='char'?'char':'search';
   const input=document.getElementById('m-main-query');
   if(input) input.dataset.intent=mode;
@@ -4151,11 +4223,13 @@ function mobileSetMainMode(intent='search'){
     button.classList.toggle('on',active);
     button.setAttribute('aria-selected',active?'true':'false');
   });
+  startMobileMainPlaceholder(mode,!!options.restart);
 }
 function mobileRunMainIntent(){
   const input=document.getElementById('m-main-query');
-  const query=(input?.value||'').trim()||'집착남주 로판인데 빙의 설정 없는거';
   const intent=input?.dataset.intent||'search';
+  const mode=intent==='char'?'char':'search';
+  const query=(input?.value||'').trim()||mobileMainExampleText(mode);
   if(intent==='char'||/캐릭터|최애|대화|미녀|미남|말투/.test(query)){
     const target=document.getElementById('char-search-inp');
     if(target) target.value=query;
@@ -4233,7 +4307,7 @@ function initMobileMainHome(){
           </div>
         </div>
         <div class="m2-input-wrap">
-          <textarea id="m-main-query" data-intent="search" aria-label="작품 또는 캐릭터 검색어">집착남주 로판인데 빙의 설정 없는거</textarea>
+          <textarea id="m-main-query" data-intent="search" aria-label="작품 또는 캐릭터 검색어" placeholder="집착남주 로판인데 빙의 설정 없는 거"></textarea>
           <button type="button" class="m2-send" onclick="mobileRunMainIntent()" aria-label="찾기">${mobileIcon()}</button>
         </div>
         <div class="m2-samples">
@@ -4310,22 +4384,22 @@ function initMobileMainHome(){
     button.addEventListener('click',()=>{
       const mode=button.dataset.mode||'search';
       const input=document.getElementById('m-main-query');
-      const searchPrompt='집착남주 로판인데 빙의 설정 없는거';
-      const charPrompt='분노조절장애 백금발 미녀 캐릭터';
-      mobileSetMainMode(mode);
-      if(input&&(input.value.trim()===''||input.value===searchPrompt||input.value===charPrompt)){
-        input.value=mode==='char'?charPrompt:searchPrompt;
-      }
+      if(input&&isMobileMainExampleText(input.value)) input.value='';
+      mobileSetMainMode(mode,{restart:true});
       input?.focus();
     });
   });
-  document.getElementById('m-main-query')?.addEventListener('keydown',event=>{
+  const mainInput=document.getElementById('m-main-query');
+  mainInput?.addEventListener('input',()=>{
+    if(!mainInput.value.trim()) startMobileMainPlaceholder(mainInput.dataset.intent||'search',true);
+  });
+  mainInput?.addEventListener('keydown',event=>{
     if(event.key==='Enter'&&!event.shiftKey){
       event.preventDefault();
       mobileRunMainIntent();
     }
   });
-  mobileSetMainMode('search');
+  mobileSetMainMode('search',{restart:true});
 }
 
 go('home');
