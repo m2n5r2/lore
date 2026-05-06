@@ -759,6 +759,49 @@ body.mobile-main .mobile-search-btn svg{
   fill:none;
   stroke-linecap:round;
 }
+body.mobile-main .pull-refresh-indicator{
+  position:fixed;
+  top:62px;
+  left:50%;
+  z-index:720;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:34px;
+  padding:7px 12px;
+  border-radius:999px;
+  border:1px solid rgba(196,181,253,.28);
+  background:rgba(14,13,29,.92);
+  color:#f4f0ff;
+  font-size:12px;
+  font-weight:800;
+  box-shadow:0 12px 28px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.04) inset;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,-44px);
+  transition:opacity .18s,transform .18s;
+}
+body.mobile-main .pull-refresh-indicator.show{
+  opacity:1;
+}
+body.mobile-main .pull-refresh-indicator.ready{
+  border-color:rgba(103,232,249,.42);
+  background:rgba(18,20,40,.95);
+}
+body.mobile-main .pull-refresh-icon{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.24);
+  border-top-color:#67e8f9;
+  flex-shrink:0;
+}
+body.mobile-main .pull-refresh-indicator.refreshing .pull-refresh-icon{
+  animation:pull-refresh-spin .7s linear infinite;
+}
+@keyframes pull-refresh-spin{
+  to{transform:rotate(360deg)}
+}
 body.mobile-main #app{
   position:fixed;
   top:56px;
@@ -2245,6 +2288,92 @@ function goBack(fallback='home'){
 // ══════════════════════════════════════
 // TAB SWITCHER (generic)
 // ══════════════════════════════════════
+let mobilePullRefreshBound=false;
+function getMobilePullScroller(target){
+  let el=target instanceof Element?target:null;
+  while(el&&el!==document.body){
+    const style=getComputedStyle(el);
+    if(/auto|scroll/.test(style.overflowY)&&el.scrollHeight>el.clientHeight+1) return el;
+    el=el.parentElement;
+  }
+  const active=document.querySelector('#app .screen.on');
+  if(active){
+    const preferred=active.querySelector('.home-inner,.fc,.srch-main,.char-main,.comm-main,.chat-msgs,.grp-msgs');
+    if(preferred&&preferred.scrollHeight>preferred.clientHeight+1) return preferred;
+    if(active.scrollHeight>active.clientHeight+1) return active;
+  }
+  return document.scrollingElement||document.documentElement;
+}
+function isMobilePullIgnoredTarget(target){
+  return !!target?.closest?.('input,textarea,select,button,[contenteditable="true"],.m2-rail,.m2-samples,.m2-strip,.m2-char-row,.m-rail');
+}
+function ensureMobilePullIndicator(){
+  let el=document.getElementById('mobile-pull-refresh');
+  if(!el){
+    el=document.createElement('div');
+    el.id='mobile-pull-refresh';
+    el.className='pull-refresh-indicator';
+    el.innerHTML='<span class="pull-refresh-icon" aria-hidden="true"></span><span class="pull-refresh-label">새로고침</span>';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function updateMobilePullIndicator(distance,ready=false,refreshing=false){
+  const el=ensureMobilePullIndicator();
+  const y=Math.min(72,Math.max(0,distance));
+  el.classList.toggle('show',distance>4||refreshing);
+  el.classList.toggle('ready',ready);
+  el.classList.toggle('refreshing',refreshing);
+  el.style.transform=`translate(-50%,${-44+y}px)`;
+  el.querySelector('.pull-refresh-label').textContent=refreshing?'새로고침 중':ready?'놓으면 새로고침':'당겨서 새로고침';
+}
+function bindMobilePullRefresh(){
+  if(mobilePullRefreshBound) return;
+  mobilePullRefreshBound=true;
+  const threshold=82;
+  let startY=0;
+  let distance=0;
+  let pulling=false;
+  let refreshing=false;
+  let scroller=null;
+  const reset=()=>{
+    if(refreshing) return;
+    pulling=false;
+    distance=0;
+    scroller=null;
+    updateMobilePullIndicator(0,false,false);
+  };
+  document.addEventListener('touchstart',event=>{
+    if(!document.body.classList.contains('mobile-main')||refreshing||event.touches.length!==1) return;
+    if(isMobilePullIgnoredTarget(event.target)) return;
+    scroller=getMobilePullScroller(event.target);
+    if((scroller?.scrollTop||0)>0) return;
+    startY=event.touches[0].clientY;
+    distance=0;
+    pulling=true;
+  },{passive:true});
+  document.addEventListener('touchmove',event=>{
+    if(!pulling||refreshing||event.touches.length!==1) return;
+    if((scroller?.scrollTop||0)>0){reset();return;}
+    const dy=event.touches[0].clientY-startY;
+    if(dy<=0){reset();return;}
+    distance=Math.min(118,dy*.72);
+    if(distance>8) event.preventDefault();
+    updateMobilePullIndicator(distance,distance>=threshold,false);
+  },{passive:false});
+  document.addEventListener('touchend',()=>{
+    if(!pulling||refreshing) return;
+    if(distance>=threshold){
+      refreshing=true;
+      updateMobilePullIndicator(threshold,true,true);
+      window.setTimeout(()=>location.reload(),160);
+      return;
+    }
+    reset();
+  },{passive:true});
+  document.addEventListener('touchcancel',reset,{passive:true});
+}
+
 function swTab(btn,paneId){
   const par=btn.parentElement;
   par.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
@@ -4201,6 +4330,7 @@ function initMobileMainHome(){
 
 go('home');
 initMobileMainHome();
+bindMobilePullRefresh();
 </script>
 </body>
 </html>
