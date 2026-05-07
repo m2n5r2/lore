@@ -1037,14 +1037,14 @@ body.mobile-main #app{
 }
 body.mobile-main #s-home .home-inner{
   max-width:440px;
-  padding:14px 14px 28px;
+  padding:14px 14px calc(96px + env(safe-area-inset-bottom));
 }
 body.mobile-main .m2-home{
   min-height:100%;
   display:flex;
   flex-direction:column;
   gap:14px;
-  padding-bottom:20px;
+  padding-bottom:36px;
 }
 body.mobile-main .m2-stage{
   position:relative;
@@ -1176,7 +1176,7 @@ body.mobile-main .m2-mode-pills button{
   background:transparent;
   color:rgba(240,238,255,.54);
   font-family:var(--ffb);
-  font-size:11px;
+  font-size:13px;
   font-weight:900;
   transition:background .2s,color .2s,box-shadow .2s;
 }
@@ -1256,12 +1256,15 @@ body.mobile-main .m2-discovery-btn::before{
   line-height:1;
 }
 body.mobile-main .m2-discovery-btn::after{
-  content:"›";
+  content:"";
   flex:0 0 auto;
   margin-left:auto;
-  color:#8feeff;
-  font-size:21px;
-  line-height:1;
+  width:7px;
+  height:7px;
+  align-self:center;
+  border-right:2px solid #8feeff;
+  border-bottom:2px solid #8feeff;
+  transform:rotate(-45deg);
 }
 body.mobile-main .m2-composer[data-mode="char"] .m2-discovery-btn{
   display:none;
@@ -1333,9 +1336,10 @@ body.mobile-main .m2-preview-reasons{
 body.mobile-main .m2-reason{
   max-width:82px;
   padding:3px 6px;
+  border:1px solid rgba(172,154,255,.34);
   border-radius:999px;
-  background:rgba(255,255,255,.08);
-  color:rgba(240,238,255,.78);
+  background:rgba(35,40,86,.24);
+  color:#eeeaff;
   font-size:9px;
   font-weight:800;
   white-space:nowrap;
@@ -1361,10 +1365,10 @@ body.mobile-main .m2-strip::-webkit-scrollbar{
 body.mobile-main .m2-tag{
   flex:0 0 auto;
   padding:6px 9px;
-  border:1px solid rgba(255,255,255,.09);
+  border:1px solid rgba(172,154,255,.42);
   border-radius:8px;
-  background:rgba(255,255,255,.04);
-  color:rgba(240,238,255,.68);
+  background:rgba(35,40,86,.2);
+  color:#eeeaff;
   font-size:10px;
   font-weight:800;
 }
@@ -1445,9 +1449,10 @@ body.mobile-main .m2-work-reasons{
 body.mobile-main .m2-work-reasons span{
   max-width:46px;
   padding:2px 5px;
+  border:1px solid rgba(172,154,255,.32);
   border-radius:999px;
-  background:rgba(196,181,253,.1);
-  color:rgba(240,238,255,.72);
+  background:rgba(35,40,86,.22);
+  color:#eeeaff;
   font-size:8px;
   font-weight:800;
   white-space:nowrap;
