@@ -1033,10 +1033,7 @@ body.mobile-main .m-char-work{
 
 /* MOBILE MAIN V2 */
 body.mobile-main #app{
-  background:
-    repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 18px),
-    repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 18px),
-    linear-gradient(180deg,#090817 0%,#060711 54%,#090817 100%);
+  background:linear-gradient(180deg,#090817 0%,#060711 54%,#090817 100%);
 }
 body.mobile-main #s-home .home-inner{
   max-width:440px;
@@ -1200,7 +1197,7 @@ body.mobile-main .m2-input-wrap{
 body.mobile-main .m2-input-wrap textarea{
   flex:1;
   min-width:0;
-  height:54px;
+  height:44px;
   resize:none;
   border:0;
   outline:0;
@@ -1231,6 +1228,43 @@ body.mobile-main .m2-send svg{
   stroke-width:2.5;
   fill:none;
   stroke-linecap:round;
+}
+body.mobile-main .m2-discovery-btn{
+  width:100%;
+  height:34px;
+  margin:8px 0 0;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  padding:0 10px 0 12px;
+  border:1px solid rgba(172,154,255,.5);
+  border-radius:12px;
+  background:rgba(255,255,255,.055);
+  color:rgba(243,240,255,.86);
+  font-family:var(--ffb);
+  font-size:13px;
+  font-weight:900;
+  line-height:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 0 1px rgba(28,38,88,.16);
+}
+body.mobile-main .m2-discovery-btn::before{
+  content:"✦";
+  flex:0 0 auto;
+  color:#8feeff;
+  font-size:14px;
+  line-height:1;
+}
+body.mobile-main .m2-discovery-btn::after{
+  content:"›";
+  flex:0 0 auto;
+  margin-left:auto;
+  color:#8feeff;
+  font-size:21px;
+  line-height:1;
+}
+body.mobile-main .m2-composer[data-mode="char"] .m2-discovery-btn{
+  display:none;
 }
 body.mobile-main .m2-samples{
   display:flex;
@@ -1482,6 +1516,291 @@ body.mobile-main .m2-char-line{
   -webkit-box-orient:vertical;
   overflow:hidden;
 }
+.mobile-filter-sheet-head{
+  display:none;
+}
+.mobile-search-sub,
+.mobile-quick-taste,
+.mobile-search-controls{
+  display:none;
+}
+body.mobile-main #s-search{
+  flex-direction:column!important;
+  gap:0;
+  padding:0;
+  overflow:hidden;
+  align-items:stretch;
+}
+body.mobile-main #s-search .srch-main{
+  height:100%;
+  padding:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  display:block;
+  overscroll-behavior:contain;
+}
+body.mobile-main #s-search .search-content{
+  max-width:none;
+  width:100%;
+  margin:0;
+  padding:14px 14px calc(24px + env(safe-area-inset-bottom));
+}
+body.mobile-main #s-search .screen-back-row{
+  margin-bottom:10px;
+}
+body.mobile-main #s-search .screen-back-btn{
+  padding:7px 11px;
+  font-size:11px;
+}
+body.mobile-main #s-search .tab-hero-row{
+  margin-bottom:0;
+}
+body.mobile-main #s-search .tab-hero{
+  margin:2px 0 0;
+  color:#d8ccff;
+  font-size:31px;
+  line-height:1.15;
+  letter-spacing:0;
+}
+body.mobile-main #s-search .premium-cta.inline-hero{
+  display:none;
+}
+body.mobile-main #s-search .mobile-search-sub{
+  display:block;
+  margin-top:5px;
+  color:rgba(240,238,255,.58);
+  font-size:12px;
+  line-height:1.5;
+}
+body.mobile-main #s-search .search-bottom{
+  position:static;
+  left:auto;
+  right:auto;
+  bottom:auto;
+  z-index:auto;
+  margin:12px 0 0;
+  padding:0;
+  pointer-events:auto;
+}
+body.mobile-main #s-search .search-bottom .big-si{
+  max-width:none;
+  margin:0;
+  padding:10px 9px 10px 12px;
+  gap:8px;
+  border-color:rgba(172,154,255,.42);
+  border-radius:14px;
+  background:rgba(255,255,255,.07);
+}
+body.mobile-main #s-search .mobile-search-mark{
+  color:#8feeff;
+  font-size:14px;
+  line-height:1;
+}
+body.mobile-main #s-search .big-si input{
+  min-width:0;
+  font-size:13px;
+  line-height:1.35;
+}
+body.mobile-main #s-search .si-go{
+  flex:0 0 auto;
+  padding:7px 12px;
+  font-size:12px;
+}
+body.mobile-main #s-search .mobile-quick-taste{
+  display:flex;
+  gap:7px;
+  margin-top:10px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+body.mobile-main #s-search .mobile-quick-taste::-webkit-scrollbar{
+  display:none;
+}
+body.mobile-main #s-search .mobile-quick-taste button{
+  flex:0 0 auto;
+  height:30px;
+  padding:0 10px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:999px;
+  background:rgba(255,255,255,.055);
+  color:rgba(240,238,255,.74);
+  font-family:var(--ffb);
+  font-size:11px;
+  font-weight:800;
+}
+body.mobile-main #s-search .mobile-quick-taste button.on{
+  border-color:rgba(143,238,255,.36);
+  background:rgba(103,232,249,.12);
+  color:#dffbff;
+}
+body.mobile-main #s-search .mobile-search-controls{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:10px;
+}
+body.mobile-main #s-search .mobile-search-controls button{
+  flex:1;
+  height:32px;
+  border:1px solid rgba(172,154,255,.22);
+  border-radius:11px;
+  background:rgba(255,255,255,.045);
+  color:rgba(240,238,255,.7);
+  font-size:11px;
+  font-weight:800;
+}
+body.mobile-main #s-search .format-strip{
+  margin:10px 0 10px;
+  padding:10px;
+  border-color:rgba(255,255,255,.08);
+  background:rgba(255,255,255,.035);
+}
+body.mobile-main #s-search .format-meta{
+  margin-bottom:8px;
+}
+body.mobile-main #s-search .format-label{
+  font-size:9px;
+}
+body.mobile-main #s-search .format-state{
+  font-size:10px;
+}
+body.mobile-main #s-search .format-chips{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+body.mobile-main #s-search .format-chips::-webkit-scrollbar{
+  display:none;
+}
+body.mobile-main #s-search .format-chip{
+  flex:0 0 auto;
+  padding:5px 10px;
+  font-size:11px;
+}
+body.mobile-main #s-search .search-facet-wrap{
+  display:none;
+}
+body.mobile-main #s-search .search-facet-wrap.mobile-open{
+  display:block;
+  position:fixed;
+  left:10px;
+  right:10px;
+  bottom:10px;
+  z-index:520;
+  max-height:68vh;
+  overflow-y:auto;
+  padding:16px 14px calc(16px + env(safe-area-inset-bottom));
+  border-color:rgba(172,154,255,.38);
+  border-radius:18px;
+  background:rgba(18,17,31,.96);
+  box-shadow:0 -18px 48px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(22px);
+}
+body.mobile-main #s-search .mobile-filter-sheet-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:4px;
+}
+body.mobile-main #s-search .mobile-filter-sheet-head span{
+  font-size:16px;
+  font-weight:900;
+}
+body.mobile-main #s-search .mobile-filter-sheet-head button{
+  height:28px;
+  padding:0 10px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  color:rgba(240,238,255,.72);
+  font-size:11px;
+  font-weight:800;
+}
+body.mobile-main #s-search .tag-sec{
+  padding:10px 0;
+}
+body.mobile-main #s-search .tag-hd h4{
+  font-size:14px;
+}
+body.mobile-main #s-search .edit-btn{
+  display:none;
+}
+body.mobile-main #s-search .tag-list2{
+  gap:7px;
+}
+body.mobile-main #s-search .tt{
+  padding:6px 10px;
+  font-size:11px;
+}
+body.mobile-main #s-search .rg{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin:12px 0 0;
+  padding-top:0;
+  overflow:visible;
+}
+body.mobile-main #s-search .rg .wc,
+body.mobile-main #s-search .sr-wc{
+  width:100%;
+  display:grid;
+  grid-template-columns:76px minmax(0,1fr);
+  gap:4px 10px;
+  padding:9px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(255,255,255,.045);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+}
+body.mobile-main #s-search .rg .wc:hover{
+  transform:none;
+}
+body.mobile-main #s-search .wc-cov{
+  grid-row:1/6;
+  width:76px;
+  height:104px;
+  margin:0;
+  border-radius:10px;
+}
+body.mobile-main #s-search .wc:hover .wc-cov{
+  transform:none;
+  box-shadow:none;
+}
+body.mobile-main #s-search .wc-title{
+  margin:1px 0 0;
+  font-size:14px;
+  font-weight:900;
+  line-height:1.3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+body.mobile-main #s-search .sr-meta{
+  margin:0;
+  font-size:10px;
+  color:rgba(240,238,255,.48);
+}
+body.mobile-main #s-search .wc-tags,
+body.mobile-main #s-search .wc-bgs{
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+  margin:1px 0 0;
+}
+body.mobile-main #s-search .wt{
+  padding:2px 6px;
+  font-size:9px;
+}
+body.mobile-main #s-search .sr-desc{
+  margin-top:2px;
+  color:rgba(240,238,255,.66);
+  font-size:10px;
+  line-height:1.5;
+  -webkit-line-clamp:2;
+}
+body.mobile-main #s-search .srch-rank{
+  display:none;
+}
 </style>
 </head>
 <body class="adult-on">
@@ -1551,9 +1870,28 @@ body.mobile-main .m2-char-line{
         <button type="button" class="screen-back-btn" onclick="goBack('home')"><span class="screen-back-ic">←</span><span>뒤로가기</span></button>
       </div>
       <div class="tab-hero-row">
-        <div class="tab-hero v">찾던 작품,<br>사실 존재하고 있었어요</div>
+        <div class="tab-hero v">오늘 뭐 볼까?</div>
       </div>
-      <div class="tab-tip clickable" onclick="go('reco')"><span>어떤 작품을 봐야 할지 잘 모르시겠나요? <span class="tip-rec">맞춤 작품 추천받기</span></span><span class="tip-arr">→</span></div>
+      <p class="mobile-search-sub">취향을 말하면 맞는 작품을 골라줄게</p>
+      <div class="search-bottom">
+        <div class="big-si">
+          <span class="mobile-search-mark" aria-hidden="true">✦</span>
+          <input id="srch-inp" type="text" placeholder="집착남주가 나오는 로판인데 빙의 설정이 없는 거 찾아줘" onkeydown="if(event.key==='Enter')doSearch()">
+          <button class="si-go" onclick="doSearch()">탐색</button>
+        </div>
+      </div>
+      <div class="mobile-quick-taste" aria-label="빠른 취향">
+        <button type="button" onclick="mobileApplySearchTaste('관계성 진한 작품')">관계성 진한</button>
+        <button type="button" onclick="mobileApplySearchTaste('집착')">집착</button>
+        <button type="button" onclick="mobileApplySearchTaste('빙의 설정 없는 로판')">빙의 없음</button>
+        <button type="button" onclick="mobileApplySearchTaste('다크 판타지')">다크판타지</button>
+        <button type="button" onclick="mobileApplySearchTaste('로맨스 판타지')">로맨스</button>
+        <button type="button" onclick="mobileApplySearchTaste('가볍게 보기 좋은 작품')">가볍게 보기</button>
+      </div>
+      <div class="mobile-search-controls">
+        <button type="button" onclick="toggleMobileSearchFilters()">필터</button>
+        <button type="button" onclick="mobileClearSearchFilters()">초기화</button>
+      </div>
       <div class="format-strip">
         <div class="format-meta">
           <div class="format-label">작품 형태</div>
@@ -1562,16 +1900,13 @@ body.mobile-main .m2-char-line{
         <div class="format-chips" id="search-format-chips"></div>
       </div>
       <div class="search-facet-wrap">
+        <div class="mobile-filter-sheet-head">
+          <span>필터</span>
+          <button type="button" onclick="toggleMobileSearchFilters()">닫기</button>
+        </div>
         <div id="search-sections"></div>
       </div>
       <div class="rg" id="result-grid"></div>
-    </div>
-    <div class="search-bottom">
-      <div class="big-si">
-        <span style="color:var(--t3);font-size:16px">🔍</span>
-        <input id="srch-inp" type="text" placeholder="집착남주가 나오는 로판인데 빙의 설정이 없는 거 찾아줘" onkeydown="if(event.key==='Enter')doSearch()">
-        <button class="si-go" onclick="doSearch()">탐색</button>
-      </div>
     </div>
   </div>
   <div class="srch-rank">
@@ -2243,6 +2578,9 @@ let charFormat='all';
 let recoMode='experienced';
 let currentScreen='home';
 const screenHistory=[];
+let appHistoryReady=false;
+let appHistoryBound=false;
+let applyingBrowserHistory=false;
 // Prototype only: move this key to a server or serverless function before production.
 const GEMINI_MODEL='gemini-2.5-flash-lite';
 const GEMINI_FUNCTION_URL='/api/gemini';
@@ -2256,10 +2594,42 @@ let recoReplyPending=false;
 // ══════════════════════════════════════
 // ROUTER
 // ══════════════════════════════════════
+function getRouteScreenFromLocation(){
+  const raw=decodeURIComponent((location.hash||'').replace(/^#\/?/,'')).trim();
+  return raw&&document.getElementById('s-'+raw)?raw:'home';
+}
+function routeUrlForScreen(id){
+  const base=location.pathname+location.search;
+  return id==='home'?base:`${base}#${encodeURIComponent(id)}`;
+}
+function syncBrowserHistory(id,replace=false){
+  if(!appHistoryReady||applyingBrowserHistory||!window.history?.pushState) return;
+  const state={loreScreen:id};
+  const url=routeUrlForScreen(id);
+  if(replace) history.replaceState(state,'',url);
+  else history.pushState(state,'',url);
+}
+function initAppHistory(){
+  if(appHistoryBound) return;
+  appHistoryBound=true;
+  const initial=getRouteScreenFromLocation();
+  history.replaceState({loreScreen:initial},'',routeUrlForScreen(initial));
+  appHistoryReady=true;
+  window.addEventListener('popstate',event=>{
+    const target=event.state?.loreScreen&&document.getElementById('s-'+event.state.loreScreen)
+      ?event.state.loreScreen
+      :getRouteScreenFromLocation();
+    applyingBrowserHistory=true;
+    if(screenHistory[screenHistory.length-1]===target) screenHistory.pop();
+    go(target,{fromBack:true,skipBrowserHistory:true});
+    applyingBrowserHistory=false;
+  });
+  go(initial,{replace:true,skipBrowserHistory:true});
+}
 function go(id,options={}){
   const el=document.getElementById('s-'+id);
   if(!el) return;
-  const {fromBack=false,replace=false}=options;
+  const {fromBack=false,replace=false,skipBrowserHistory=false}=options;
   if(!fromBack&&!replace&&id!==currentScreen) screenHistory.push(currentScreen);
   document.querySelectorAll('#app .screen').forEach(el=>el.classList.remove('on'));
   el.classList.add('on');
@@ -2273,16 +2643,21 @@ function go(id,options={}){
   if(id==='chars'){renderCharFormatBar();renderChars();}
   if(id==='reco-chat') initRecoChat();
   if(typeof queuePixieMove==='function') queuePixieMove(id,true);
+  if(!skipBrowserHistory) syncBrowserHistory(id,replace||fromBack);
 }
 function goBack(fallback='home'){
+  if(appHistoryReady&&screenHistory.length){
+    history.back();
+    return;
+  }
   while(screenHistory.length){
     const prev=screenHistory.pop();
     if(prev&&prev!==currentScreen){
-      go(prev,{fromBack:true});
+      go(prev,{fromBack:true,replace:true});
       return;
     }
   }
-  if(fallback!==currentScreen) go(fallback,{fromBack:true});
+  if(fallback!==currentScreen) go(fallback,{fromBack:true,replace:true});
 }
 
 // ══════════════════════════════════════
@@ -2866,7 +3241,9 @@ function getSearchResults(query=''){
   const q=query.trim().toLowerCase();
   return WORKS.filter(w=>{
     const formatOk=matchesWorkFormat(w,searchFormat);
-    const qOk=!q||w.title.toLowerCase().includes(q)||w.desc.toLowerCase().includes(q)||w.tags.some(t=>t.toLowerCase().includes(q))||w.genre.some(g=>g.toLowerCase().includes(q));
+    const searchable=[w.title,w.desc,...w.tags,...w.genre].join(' ').toLowerCase();
+    const terms=q.split(/\s+/).filter(Boolean);
+    const qOk=!terms.length||terms.some(term=>searchable.includes(term));
     const tagOk=!selectedSearchTags.size||[...selectedSearchTags].every(tag=>w.tags.some(t=>t.includes(tag))||w.desc.includes(tag)||w.genre.some(g=>g.includes(tag)));
     return formatOk&&qOk&&tagOk;
   });
@@ -3393,6 +3770,28 @@ function applyGrpSit(){
 // ══════════════════════════════════════
 function doSearch(){
   renderSearchResults();
+}
+function mobileApplySearchTaste(query){
+  const input=document.getElementById('srch-inp');
+  if(input) input.value=query;
+  document.querySelectorAll('.mobile-quick-taste button').forEach(button=>button.classList.remove('on'));
+  window.event?.currentTarget?.classList?.add('on');
+  doSearch();
+}
+function toggleMobileSearchFilters(){
+  document.querySelector('#s-search .search-facet-wrap')?.classList.toggle('mobile-open');
+}
+function mobileClearSearchFilters(){
+  selectedSearchTags.clear();
+  searchFormat='all';
+  const input=document.getElementById('srch-inp');
+  if(input) input.value='';
+  document.querySelectorAll('.mobile-quick-taste button').forEach(button=>button.classList.remove('on'));
+  document.querySelector('#s-search .search-facet-wrap')?.classList.remove('mobile-open');
+  renderSearchFormatBar();
+  renderSearchSections();
+  renderSearchRankList();
+  doSearch();
 }
 
 function expandWorksPool(targetCount=40){
@@ -4217,7 +4616,10 @@ function startMobileMainPlaceholder(mode='search',restart=false){
 function mobileSetMainMode(intent='search',options={}){
   const mode=intent==='char'?'char':'search';
   const input=document.getElementById('m-main-query');
-  if(input) input.dataset.intent=mode;
+  if(input){
+    input.dataset.intent=mode;
+    input.closest('.m2-composer')?.setAttribute('data-mode',mode);
+  }
   document.querySelectorAll('.m2-mode-btn').forEach(button=>{
     const active=button.dataset.mode===mode;
     button.classList.toggle('on',active);
@@ -4299,7 +4701,7 @@ function initMobileMainHome(){
         </div>
       </section>
 
-      <section class="m2-composer">
+      <section class="m2-composer" data-mode="search">
         <div class="m2-composer-head">
           <div class="m2-mode-pills" role="tablist" aria-label="검색 모드">
             <button type="button" class="m2-mode-btn on" data-mode="search" role="tab" aria-selected="true">작품 탐색</button>
@@ -4310,12 +4712,7 @@ function initMobileMainHome(){
           <textarea id="m-main-query" data-intent="search" aria-label="작품 또는 캐릭터 검색어" placeholder="집착남주 로판인데 빙의 설정 없는 거"></textarea>
           <button type="button" class="m2-send" onclick="mobileRunMainIntent()" aria-label="찾기">${mobileIcon()}</button>
         </div>
-        <div class="m2-samples">
-          <button type="button" class="m2-sample" data-intent="search" data-prompt="집착남주 로판인데 빙의 설정 없는거">집착남주 로판</button>
-          <button type="button" class="m2-sample" data-intent="char" data-prompt="분노조절장애 백금발 미녀 캐릭터">백금발 미녀 캐릭터</button>
-          <button type="button" class="m2-sample" data-intent="search" data-prompt="어둡고 관계성 진한 다크판타지">다크판타지</button>
-          <button type="button" class="m2-sample" data-intent="char" data-prompt="나를 기억하는 차분한 집사 캐릭터">기억하는 최애</button>
-        </div>
+        <button type="button" class="m2-discovery-btn" onclick="go('search')">뭘 봐야 할지 모르겠다면 추천받기</button>
         ${previewWork?`
           <div class="m2-preview" onclick="openDetail(${previewWork.id})">
             <div class="m2-preview-cover">${wCover(previewWork,'100%','100%')}</div>
@@ -4402,8 +4799,8 @@ function initMobileMainHome(){
   mobileSetMainMode('search',{restart:true});
 }
 
-go('home');
 initMobileMainHome();
+initAppHistory();
 bindMobilePullRefresh();
 </script>
 </body>
