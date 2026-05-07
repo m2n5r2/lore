@@ -2672,23 +2672,34 @@ function goBack(fallback='home'){
 // TAB SWITCHER (generic)
 // ══════════════════════════════════════
 let mobilePullRefreshBound=false;
-function getMobilePullScroller(target){
-  let el=target instanceof Element?target:null;
-  while(el&&el!==document.body){
-    const style=getComputedStyle(el);
-    if(/auto|scroll/.test(style.overflowY)&&el.scrollHeight>el.clientHeight+1) return el;
-    el=el.parentElement;
-  }
+const MOBILE_PULL_SCROLL_CANDIDATES='.home-inner,.fc,.srch-main,.char-main,.comm-main,.chat-msgs,.grp-msgs,.screen.on';
+function isScrollableY(el){
+  if(!el) return false;
+  const style=getComputedStyle(el);
+  return /auto|scroll/.test(style.overflowY)&&el.scrollHeight>el.clientHeight+1;
+}
+function getActiveMobileScroller(){
   const active=document.querySelector('#app .screen.on');
-  if(active){
-    const preferred=active.querySelector('.home-inner,.fc,.srch-main,.char-main,.comm-main,.chat-msgs,.grp-msgs');
-    if(preferred&&preferred.scrollHeight>preferred.clientHeight+1) return preferred;
-    if(active.scrollHeight>active.clientHeight+1) return active;
+  if(!active) return document.scrollingElement||document.documentElement;
+  for(const candidate of active.querySelectorAll(MOBILE_PULL_SCROLL_CANDIDATES)){
+    if(isScrollableY(candidate)) return candidate;
+  }
+  if(isScrollableY(active)) return active;
+  for(const candidate of active.querySelectorAll('*')){
+    if(isScrollableY(candidate)) return candidate;
   }
   return document.scrollingElement||document.documentElement;
 }
+function getMobilePullScroller(target){
+  let el=target instanceof Element?target:null;
+  while(el&&el!==document.body){
+    if(isScrollableY(el)) return el;
+    el=el.parentElement;
+  }
+  return getActiveMobileScroller();
+}
 function isMobilePullIgnoredTarget(target){
-  return !!target?.closest?.('input,textarea,select,button,[contenteditable="true"],.m2-rail,.m2-samples,.m2-strip,.m2-char-row,.m-rail');
+  return !!target?.closest?.('input,textarea,select,[contenteditable="true"],.m2-rail,.m2-samples,.m2-strip,.m2-char-row,.m-rail');
 }
 function ensureMobilePullIndicator(){
   let el=document.getElementById('mobile-pull-refresh');
